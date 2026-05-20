@@ -1,244 +1,212 @@
-# Dictus Desktop
+<p align="center">
+  <img src="https://raw.githubusercontent.com/getdictus/dictus-brand/main/source/appicon-light.svg" alt="Dictus" width="120" height="120" />
+</p>
 
-**Privacy-first speech-to-text. Your voice stays on your device.**
+<h1 align="center">Dictus Desktop</h1>
 
-Dictus Desktop is a fork of [Handy](https://github.com/cjpais/Handy) — a free, open-source speech-to-text application that works completely offline.
+<p align="center">
+  <strong>100% offline voice dictation for macOS, Windows & Linux.</strong><br />
+  Press a shortcut, speak, and your words appear in any app — entirely on your machine.
+</p>
 
-Dictus Desktop is a cross-platform desktop application that provides simple, privacy-focused speech transcription. Press a shortcut, speak, and have your words appear in any text field — entirely on your own computer, without sending any information to the cloud.
+<p align="center">
+  <a href="https://github.com/getdictus/dictus-desktop/actions"><img src="https://img.shields.io/github/actions/workflow/status/getdictus/dictus-desktop/build.yml?branch=main&label=build" alt="Build" /></a>
+  <a href="https://github.com/getdictus/dictus-desktop/releases/latest"><img src="https://img.shields.io/github/v/release/getdictus/dictus-desktop?include_prereleases&label=release" alt="Latest release" /></a>
+  <a href="LICENSE"><img src="https://img.shields.io/github/license/getdictus/dictus-desktop" alt="License" /></a>
+  <a href="https://github.com/getdictus/dictus-desktop/stargazers"><img src="https://img.shields.io/github/stars/getdictus/dictus-desktop?style=social" alt="Stars" /></a>
+</p>
 
-Dictus is also available on iOS and Android at [getdictus.com](https://getdictus.com).
+<p align="center">
+  <a href="https://getdictus.com">Website</a> ·
+  <a href="https://github.com/getdictus/dictus-desktop/releases/latest">Download</a> ·
+  <a href="https://github.com/getdictus/dictus-ios">iOS</a> ·
+  <a href="https://github.com/getdictus/dictus-android">Android</a> ·
+  <a href="https://t.me/getdictus">Community</a>
+</p>
 
-## How It Works
+---
 
-1. **Press** a configurable keyboard shortcut to start/stop recording (or use push-to-talk mode)
-2. **Speak** your words while the shortcut is active
-3. **Release** and Dictus processes your speech using Whisper
-4. **Get** your transcribed text pasted directly into whatever app you are using
+## Why Dictus Desktop?
 
-The process is entirely local:
+- 🔒 **100% offline** — no network calls, no cloud, no telemetry. Your voice never leaves your machine.
+- 🆓 **Free & open source** — MIT licensed, no subscription, no account required.
+- ⚡ **Fast & accurate** — Whisper (GPU-accelerated) or Parakeet V3 (CPU, ~5× realtime).
+- 🖥 **Cross-platform** — macOS (Apple Silicon & Intel), Windows, Linux.
+- ⌨️ **Anywhere you type** — global shortcut pastes transcription into the focused app.
 
-- Silence is filtered using VAD (Voice Activity Detection) with Silero
-- Transcription uses your choice of models:
-  - **Whisper models** (Small/Medium/Turbo/Large) with GPU acceleration when available
-  - **Parakeet V3** — CPU-optimized model with excellent performance and automatic language detection
-- Works on macOS, Windows, and Linux
+## Quick start
 
-## Quick Start
+1. **Download** the latest build from [Releases](https://github.com/getdictus/dictus-desktop/releases/latest) (macOS `.dmg`, Windows `.msi`, Linux `.AppImage` / `.deb`).
+2. **Launch** Dictus Desktop and grant microphone + accessibility permissions.
+3. **Configure** your shortcut in Settings (default works out of the box).
+4. **Press, speak, release** — your words land in any text field.
 
-### Installation
+> Building from source? See [BUILD.md](BUILD.md).
 
-Download from [getdictus.com](https://getdictus.com) (desktop downloads coming soon) or build from source using [BUILD.md](BUILD.md).
+## How it works
 
-1. Install the application
-2. Launch Dictus Desktop and grant necessary system permissions (microphone, accessibility)
-3. Configure your preferred keyboard shortcuts in Settings
-4. Start transcribing
+1. Press a configurable shortcut to start/stop recording (or push-to-talk).
+2. Speak — Silero VAD filters silence in real time.
+3. Whisper or Parakeet transcribes locally — GPU when available, CPU otherwise.
+4. Transcribed text is pasted into the focused application.
 
-### Development Setup
+## How Dictus compares
 
-See [BUILD.md](BUILD.md) for detailed build instructions including platform-specific requirements.
+| Feature | **Dictus Desktop** | SuperWhisper | Wispr Flow | MacWhisper |
+| --- | :---: | :---: | :---: | :---: |
+| Price | **Free** | Free / $8.49/mo | Free / $15/mo | Free / $6.99/mo |
+| 100% offline | ✅ | ⚠️ | ❌ | ⚠️ |
+| Privacy-first | ✅ | ⚠️ | ❌ | ⚠️ |
+| Open source | ✅ | ❌ | ❌ | ❌ |
+| Platforms | macOS · Windows · Linux | iOS · macOS · Win | iOS · macOS · Win · Android | iOS · macOS |
+| Mobile companion | ✅ ([iOS](https://github.com/getdictus/dictus-ios) · [Android](https://github.com/getdictus/dictus-android)) | macOS-only ecosystem | partial | macOS-only ecosystem |
+
+## Models
+
+| Model | CPU | GPU | Notes |
+| --- | :---: | :---: | --- |
+| Whisper Small / Medium / Turbo / Large | ✓ | ⭐ | GPU recommended for Medium+ |
+| Parakeet V3 | ⭐ | — | CPU-optimized, ~5× realtime, auto language detection |
 
 ## Architecture
 
-Dictus Desktop is built as a Tauri application combining:
+Dictus Desktop is a Tauri app: a React + TypeScript settings UI on top of a Rust core.
 
-- **Frontend**: React + TypeScript with Tailwind CSS for the settings UI
-- **Backend**: Rust for system integration, audio processing, and ML inference
-- **Core Libraries**:
-  - `whisper-rs`: Local speech recognition with Whisper models
-  - `transcribe-rs`: CPU-optimized speech recognition with Parakeet models
-  - `cpal`: Cross-platform audio I/O
-  - `vad-rs`: Voice Activity Detection
-  - `rdev`: Global keyboard shortcuts and system events
-  - `rubato`: Audio resampling
+- `whisper-rs` — Whisper inference
+- `transcribe-rs` — Parakeet V3 inference
+- `cpal` — cross-platform audio capture
+- `vad-rs` — Silero Voice Activity Detection
+- `rdev` / OS APIs — global shortcuts and paste
 
-### Debug Mode
+## Roadmap
 
-Dictus Desktop includes an advanced debug mode for development and troubleshooting. Access it by pressing:
+- [x] macOS (Apple Silicon + Intel), Windows x64, Linux x64
+- [x] Whisper + Parakeet V3 engines
+- [x] CLI flags & signal-based control
+- [ ] Smart Mode Pro — local LLM reformulation
+- [ ] Custom vocabulary (technical terms, names)
+- [ ] Audio-file transcription
+- [ ] Searchable local history
+- [ ] Sync settings across Dictus iOS / Android / Desktop (offline-first, peer-to-peer)
 
-- **macOS**: `Cmd+Shift+D`
-- **Windows/Linux**: `Ctrl+Shift+D`
+Open an issue with a [feature request](https://github.com/getdictus/dictus-desktop/issues/new) — we prioritize the most-upvoted ideas.
 
-### CLI Parameters
+## Platform notes
 
-Dictus Desktop supports command-line flags for controlling a running instance and customizing startup behavior. These work on all platforms (macOS, Windows, Linux).
+<details>
+<summary><strong>Linux</strong> — text input tools & global shortcuts</summary>
 
-> **Note:** The binary is currently named `handy` (a V2 rename is planned). Use `handy` in all CLI commands until the rename is complete.
+For reliable text input, install the right tool for your display server:
 
-**Remote control flags** (sent to an already-running instance via the single-instance plugin):
+| Display Server | Tool | Install |
+| --- | --- | --- |
+| X11 | `xdotool` | `sudo apt install xdotool` |
+| Wayland | `wtype` | `sudo apt install wtype` |
+| Both | `dotool` | `sudo apt install dotool` (add user to `input` group) |
+
+**Runtime library:** if startup fails with `libgtk-layer-shell.so.0`, install your distro's package (`libgtk-layer-shell0` on Debian/Ubuntu, `gtk-layer-shell` on Fedora/Arch).
+
+**Wayland shortcuts:** must be configured at the desktop-environment level. Use the CLI flags below as the command for your custom binding:
 
 ```bash
-handy --toggle-transcription    # Toggle recording on/off
-handy --toggle-post-process     # Toggle recording with post-processing on/off
-handy --cancel                  # Cancel the current operation
+handy --toggle-transcription    # toggle recording
+handy --toggle-post-process     # toggle with post-processing
+handy --cancel                  # cancel current operation
 ```
 
-**Startup flags:**
+Sway / i3 example:
+
+```ini
+bindsym $mod+o exec handy --toggle-transcription
+```
+
+Or via Unix signals (works with any hotkey daemon):
 
 ```bash
+pkill -USR2 -n handy   # toggle transcription
+pkill -USR1 -n handy   # toggle with post-processing
+```
+
+</details>
+
+<details>
+<summary><strong>macOS</strong> — CLI usage when installed as a bundle</summary>
+
+```bash
+/Applications/Dictus.app/Contents/MacOS/handy --toggle-transcription
+```
+
+</details>
+
+<details>
+<summary><strong>CLI flags</strong></summary>
+
+```bash
+handy --toggle-transcription    # Toggle recording
+handy --toggle-post-process     # Toggle recording with post-processing
+handy --cancel                  # Cancel current operation
 handy --start-hidden            # Start without showing the main window
 handy --no-tray                 # Start without the system tray icon
-handy --debug                   # Enable debug mode with verbose logging
-handy --help                    # Show all available flags
+handy --debug                   # Enable verbose logging
+handy --help                    # Show all flags
 ```
 
-Flags can be combined for autostart scenarios:
+> The binary is currently named `handy` (a V2 rename is planned).
 
-```bash
-handy --start-hidden --no-tray
-```
+</details>
 
-> **macOS tip:** When Dictus Desktop is installed as an app bundle, invoke the binary directly:
->
-> ```bash
-> /Applications/Dictus.app/Contents/MacOS/handy --toggle-transcription
-> ```
+## System requirements
 
-## Known Issues & Current Limitations
+**Whisper (GPU recommended for Medium+):**
+- macOS — Apple Silicon or Intel
+- Windows — Intel / AMD / NVIDIA GPU
+- Linux — Intel / AMD / NVIDIA GPU (Ubuntu 22.04 / 24.04 tested)
 
-This project is actively being developed and has some [known issues](https://github.com/getdictus/dictus-desktop/issues). We believe in transparency about the current state:
+**Parakeet V3 (CPU-only):**
+- Intel Skylake (6th gen) / AMD equivalent or newer
 
-### Major Issues (Help Wanted)
+## Known issues
 
-**Whisper Model Crashes:**
+This project is actively developed. See [open issues](https://github.com/getdictus/dictus-desktop/issues) for current state. Major items:
 
-- Whisper models crash on certain system configurations (Windows and Linux)
-- Does not affect all systems — issue is configuration-dependent
-  - If you experience crashes and are a developer, please help fix and provide debug logs
+- Whisper crashes on some Windows / Linux configurations (help wanted — debug logs welcome).
+- Wayland support is partial — requires `wtype` or `dotool` (see Linux notes).
 
-**Wayland Support (Linux):**
+## Contributing
 
-- Limited support for Wayland display server
-- Requires [`wtype`](https://github.com/atx/wtype) or [`dotool`](https://sr.ht/~geb/dotool/) for text input to work correctly (see [Linux Notes](#linux-notes) below for installation)
+Contributions are very welcome. Please:
 
-### Linux Notes
+1. Browse [open issues](https://github.com/getdictus/dictus-desktop/issues) — `good first issue` and `help wanted` are good starts.
+2. Fork, branch, and submit a PR with a clear description.
+3. Test on your target platform before requesting review.
+4. Join the conversation on [Telegram](https://t.me/getdictus) or via [hello@getdictus.com](mailto:hello@getdictus.com).
 
-**Text Input Tools:**
+## Support the project
 
-For reliable text input on Linux, install the appropriate tool for your display server:
+Dictus is free and will stay free. If it saves you time, consider [supporting development](https://getdictus.com/donate) — it directly funds new features and platform support.
 
-| Display Server | Recommended Tool | Install Command                                    |
-| -------------- | ---------------- | -------------------------------------------------- |
-| X11            | `xdotool`        | `sudo apt install xdotool`                         |
-| Wayland        | `wtype`          | `sudo apt install wtype`                           |
-| Both           | `dotool`         | `sudo apt install dotool` (requires `input` group) |
+## Community
 
-- **X11**: Install `xdotool` for both direct typing and clipboard paste shortcuts
-- **Wayland**: Install `wtype` (preferred) or `dotool` for text input to work correctly
-- **dotool setup**: Requires adding your user to the `input` group: `sudo usermod -aG input $USER` (then log out and back in)
-
-Without these tools, Dictus Desktop falls back to enigo which may have limited compatibility, especially on Wayland.
-
-**Other Notes:**
-
-- **Runtime library dependency (`libgtk-layer-shell.so.0`)**:
-  - Dictus Desktop links `gtk-layer-shell` on Linux. If startup fails with `error while loading shared libraries: libgtk-layer-shell.so.0`, install the runtime package for your distro:
-
-    | Distro        | Package to install    | Example command                        |
-    | ------------- | --------------------- | -------------------------------------- |
-    | Ubuntu/Debian | `libgtk-layer-shell0` | `sudo apt install libgtk-layer-shell0` |
-    | Fedora/RHEL   | `gtk-layer-shell`     | `sudo dnf install gtk-layer-shell`     |
-    | Arch Linux    | `gtk-layer-shell`     | `sudo pacman -S gtk-layer-shell`       |
-
-  - For building from source on Ubuntu/Debian, you may also need `libgtk-layer-shell-dev`.
-
-- The recording overlay is disabled by default on Linux (`Overlay Position: None`) because certain compositors treat it as the active window. When the overlay is visible it can steal focus, which prevents Dictus Desktop from pasting back into the application that triggered transcription. If you enable the overlay anyway, be aware that clipboard-based pasting might fail or end up in the wrong window.
-- If you are having trouble with the app, running with the environment variable `WEBKIT_DISABLE_DMABUF_RENDERER=1` may help.
-- **Global keyboard shortcuts (Wayland):** On Wayland, system-level shortcuts must be configured through your desktop environment or window manager. Use the [CLI flags](#cli-parameters) as the command for your custom shortcut.
-
-  **GNOME:**
-  1. Open **Settings > Keyboard > Keyboard Shortcuts > Custom Shortcuts**
-  2. Click the **+** button to add a new shortcut
-  3. Set the **Name** to `Toggle Dictus Transcription`
-  4. Set the **Command** to `handy --toggle-transcription`
-  5. Click **Set Shortcut** and press your desired key combination (e.g., `Super+O`)
-
-  **KDE Plasma:**
-  1. Open **System Settings > Shortcuts > Custom Shortcuts**
-  2. Click **Edit > New > Global Shortcut > Command/URL**
-  3. Name it `Toggle Dictus Transcription`
-  4. In the **Trigger** tab, set your desired key combination
-  5. In the **Action** tab, set the command to `handy --toggle-transcription`
-
-  **Sway / i3:**
-
-  Add to your config file (`~/.config/sway/config` or `~/.config/i3/config`):
-
-  ```ini
-  bindsym $mod+o exec handy --toggle-transcription
-  ```
-
-  **Hyprland:**
-
-  Add to your config file (`~/.config/hypr/hyprland.conf`):
-
-  ```ini
-  bind = $mainMod, O, exec, handy --toggle-transcription
-  ```
-
-- You can also manage global shortcuts outside of Dictus Desktop via Unix signals, which lets Wayland window managers or other hotkey daemons keep ownership of keybindings:
-
-  | Signal    | Action                                    | Example                |
-  | --------- | ----------------------------------------- | ---------------------- |
-  | `SIGUSR2` | Toggle transcription                      | `pkill -USR2 -n handy` |
-  | `SIGUSR1` | Toggle transcription with post-processing | `pkill -USR1 -n handy` |
-
-  Example Sway config:
-
-  ```ini
-  bindsym $mod+o exec pkill -USR2 -n handy
-  bindsym $mod+p exec pkill -USR1 -n handy
-  ```
-
-  `pkill` here simply delivers the signal — it does not terminate the process.
-
-### Platform Support
-
-- **macOS (both Intel and Apple Silicon)**
-- **x64 Windows**
-- **x64 Linux**
-
-### System Requirements/Recommendations
-
-The following are recommendations for running Dictus Desktop on your machine. If you do not meet the system requirements, the performance of the application may be degraded.
-
-**For Whisper Models:**
-
-- **macOS**: M series Mac, Intel Mac
-- **Windows**: Intel, AMD, or NVIDIA GPU
-- **Linux**: Intel, AMD, or NVIDIA GPU
-  - Ubuntu 22.04, 24.04
-
-**For Parakeet V3 Model:**
-
-- **CPU-only operation** — runs on a wide variety of hardware
-- **Minimum**: Intel Skylake (6th gen) or equivalent AMD processors
-- **Performance**: ~5x real-time speed on mid-range hardware (tested on i5)
-- **Automatic language detection** — no manual language selection required
-
-## How to Contribute
-
-1. **Check existing issues** at [github.com/getdictus/dictus-desktop/issues](https://github.com/getdictus/dictus-desktop/issues)
-2. **Fork the repository** and create a feature branch
-3. **Test thoroughly** on your target platform
-4. **Submit a pull request** with clear description of changes
-5. **Join the discussion** — reach out at [hello@getdictus.com](mailto:hello@getdictus.com) or join the community on [Telegram](https://t.me/getdictus)
-
-## Contact & Community
-
-- **GitHub Issues**: [github.com/getdictus/dictus-desktop/issues](https://github.com/getdictus/dictus-desktop/issues)
-- **Website**: [getdictus.com](https://getdictus.com)
-- **Email**: [hello@getdictus.com](mailto:hello@getdictus.com)
-- **Telegram**: [t.me/getdictus](https://t.me/getdictus)
+- 🌐 [getdictus.com](https://getdictus.com)
+- 💬 [Telegram](https://t.me/getdictus)
+- 🐛 [Issues](https://github.com/getdictus/dictus-desktop/issues)
+- 📧 [hello@getdictus.com](mailto:hello@getdictus.com)
 
 ## License
 
-MIT License — see [LICENSE](LICENSE) file for details.
+MIT — see [LICENSE](LICENSE).
 
 ## Acknowledgments
 
-- **Handy** by [cjpais](https://github.com/cjpais/Handy) — the original project Dictus Desktop is forked from
-- **Whisper** by OpenAI for the speech recognition model
-- **whisper.cpp and ggml** for amazing cross-platform whisper inference/acceleration
-- **Silero** for great lightweight VAD
-- **Tauri** team for the excellent Rust-based app framework
+Dictus Desktop is a fork of **[Handy](https://github.com/cjpais/Handy)** by [cjpais](https://github.com/cjpais) — huge thanks for the foundation.
+
+- [OpenAI Whisper](https://github.com/openai/whisper) — speech recognition model
+- [whisper.cpp](https://github.com/ggerganov/whisper.cpp) & ggml — cross-platform inference
+- [Silero VAD](https://github.com/snakers4/silero-vad) — voice activity detection
+- [Tauri](https://tauri.app) — Rust-based app framework
+
+---
+
+<p align="center">
+  <sub>Made with ❤️ by <a href="https://pivi.solutions">PIVI Solutions</a> · <a href="https://github.com/getdictus">@getdictus</a></sub>
+</p>
