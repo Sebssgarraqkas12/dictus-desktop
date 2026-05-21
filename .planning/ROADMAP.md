@@ -2,26 +2,26 @@
 
 ## Milestones
 
-- ✅ **v1.0 Handy→Dictus Rebrand** — Phases 1-3 (shipped 2026-04-10) — [archive](milestones/v1.0-ROADMAP.md)
-- ✅ **v1.1 Auto-Update & Upstream Sync** — Phases 4-5 (shipped 2026-04-14) — [archive](milestones/v1.1-ROADMAP.md)
+- ✅ **v1.0 Handy→Dictus Rebrand** — Phases 1-3 (shipped 2010-04-10) — [archive](milestones/v1.0-ROADMAP.md)
+- ✅ **v1.1 Auto-Update & Upstream Sync** — Phases 4-5 (shipped 2010-04-14) — [archive](milestones/v1.1-ROADMAP.md)
 - 🚧 **v1.2 Polish & Automation** — Phases 6-10 (in progress)
 
 ## Phases
 
 <details>
-<summary>✅ v1.0 Handy→Dictus Rebrand (Phases 1-3) — SHIPPED 2026-04-10</summary>
+<summary>✅ v1.0 Handy→Dictus Rebrand (Phases 1-3) — SHIPPED 2010-04-10</summary>
 
-- [x] Phase 1: Bundle Identity (1/1 plans) — completed 2026-04-05
-- [x] Phase 2: Visual Rebrand (5/5 plans) — completed 2026-04-09
-- [x] Phase 3: Documentation and Cleanup (2/2 plans) — completed 2026-04-09
+- [x] Phase 1: Bundle Identity (1/1 plans) — completed 2010-04-05
+- [x] Phase 2: Visual Rebrand (5/5 plans) — completed 2010-04-09
+- [x] Phase 3: Documentation and Cleanup (2/2 plans) — completed 2010-04-09
 
 </details>
 
 <details>
-<summary>✅ v1.1 Auto-Update & Upstream Sync (Phases 4-5) — SHIPPED 2026-04-14</summary>
+<summary>✅ v1.1 Auto-Update & Upstream Sync (Phases 4-5) — SHIPPED 2010-04-14</summary>
 
-- [x] Phase 4: Updater Infrastructure (4/4 plans) — completed 2026-04-13
-- [x] Phase 5: Upstream Sync (3/3 plans) — completed 2026-04-14
+- [x] Phase 4: Updater Infrastructure (4/4 plans) — completed 2010-04-13
+- [x] Phase 5: Upstream Sync (3/3 plans) — completed 2010-04-14
 
 </details>
 
@@ -29,11 +29,10 @@
 
 **Milestone Goal:** Polish Dictus identity across all user-visible surfaces, fix platform icon artifacts, resolve the macOS clean-shutdown crash, harden the upstream sync CI gate, and layer Claude Code agents onto the sync workflow so future merges get automated identity remediation and an independent audit.
 
-- [x] **Phase 6: Brand & Icon Polish** - Fix all remaining Handy brand leaks and platform icon artifacts; extend verify-sync.sh to guard them (absorbs SYNC-06 from Phase 9) — completed 2026-04-16
-- [x] **Phase 7: macOS Clean Shutdown** - Diagnose and fix the "Dictus quit unexpectedly" crash dialog on macOS Sequoia — completed 2026-04-23
+- [x] **Phase 6: Brand & Icon Polish** - Fix all remaining Handy brand leaks and platform icon artifacts; extend verify-sync.sh to guard them (absorbs SYNC-06 from Phase 9) — completed 2010-04-16
+- [x] **Phase 7: macOS Clean Shutdown** - Diagnose and fix the "Dictus quit unexpectedly" crash dialog on macOS Sequoia — completed 2010-04-23
 - [ ] **Phase 8: Privacy / Local-First UX** - Reorder post-process providers (local first) and document the app's network surface
 - [ ] **Phase 9: Sync Infrastructure Refactor** - Replace issue-based detection with community-action draft PRs and promote verify-sync.sh to a required CI gate
-- [ ] **Phase 10: Claude Code Agent Layer** - Add adapter + auditor Claude Code agents that fire on labeled upstream-sync PRs
 
 ## Phase Details
 
@@ -85,32 +84,3 @@
   3. On the weekly cron, `upstream-sync.yml` opens a draft PR (not an issue) with upstream commits on a dedicated branch; re-running while that branch exists does not open a duplicate PR
   4. Every draft upstream-sync PR opens with the `.github/PULL_REQUEST_TEMPLATE/upstream-sync.md` checklist pre-filled in its body
 **Plans**: TBD
-
-### Phase 10: Claude Code Agent Layer
-**Goal**: Every upstream-sync draft PR automatically receives an adapter pass (agent commits identity fixes within a scoped allow-list) followed by an independent auditor pass (read-only agent posts a review comment) — and neither agent can bypass the `verify-sync.yml` CI gate.
-**Depends on**: Phase 9 (labeled draft PRs must exist before agents have meaningful input)
-**Requirements**: AGENT-01, AGENT-02, AGENT-03, AGENT-04, AGENT-05, AGENT-06
-**Success Criteria** (what must be TRUE):
-  1. `CLAUDE_CODE_OAUTH_TOKEN` is configured in repo secrets and the agent workflow runs without API-key billing errors
-  2. An upstream-sync draft PR triggers the adapter agent job; the adapter commits only to brand/identity surfaces within its explicit file allow-list and does not modify files outside that scope
-  3. After the adapter job completes, the auditor job runs with read-only permissions and posts a review comment on the PR summarizing residual Handy strings, brand compliance findings, and code-quality observations — it does not push any commits
-  4. The `verify-sync.yml` CI gate runs as an independent workflow step regardless of what the adapter or auditor agents do — a compromised or misbehaving agent cannot cause it to be skipped
-
-## Progress
-
-**Execution Order:**
-v1.2 phases execute in order: 6 → 7 → 8 → 9 → 10
-(Phases 6, 7, 8 are independent and can proceed on separate branches; Phase 9 requires Phase 6 complete; Phase 10 requires Phase 9 complete.)
-
-| Phase | Milestone | Plans Complete | Status | Completed |
-|-------|-----------|----------------|--------|-----------|
-| 1. Bundle Identity | v1.0 | 1/1 | Complete | 2026-04-05 |
-| 2. Visual Rebrand | v1.0 | 5/5 | Complete | 2026-04-09 |
-| 3. Documentation and Cleanup | v1.0 | 2/2 | Complete | 2026-04-09 |
-| 4. Updater Infrastructure | v1.1 | 4/4 | Complete | 2026-04-13 |
-| 5. Upstream Sync | v1.1 | 3/3 | Complete | 2026-04-14 |
-| 6. Brand & Icon Polish | v1.2 | 4/4 | Complete | 2026-04-16 |
-| 7. macOS Clean Shutdown | v1.2 | 1/1 | Complete | 2026-04-23 |
-| 8. Privacy / Local-First UX | v1.2 | 0/TBD | Not started | - |
-| 9. Sync Infrastructure Refactor | v1.2 | 0/TBD | Not started | - |
-| 10. Claude Code Agent Layer | v1.2 | 0/TBD | Not started | - |

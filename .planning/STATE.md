@@ -2,12 +2,12 @@
 gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: Polish & Automation
-status: in_progress
-stopped_at: Phase 7 complete — ready for Phase 8
-last_updated: "2026-04-23T22:40:00.000Z"
-last_activity: 2026-04-23 — Plan 07-01 complete (SHUT-01/02/03); Phase 6.1 icon regression fixed a posteriori (commit 34de33e)
+status: completed
+stopped_at: Phase 7 context gathered
+last_updated: "2026-05-21T11:39:19.720Z"
+last_activity: 2026-04-23 — Plan 07-01 SUMMARY written; Phase 6.1 icon regression fixed (commit 34de33e)
 progress:
-  total_phases: 5
+  total_phases: 4
   completed_phases: 2
   total_plans: 5
   completed_plans: 5
@@ -30,7 +30,7 @@ Plan: 07-01 complete (SHUT-01/02/03)
 Status: Phase 7 complete; validation window closed with no crash reproduction
 Last activity: 2026-04-23 — Plan 07-01 SUMMARY written; Phase 6.1 icon regression fixed (commit 34de33e)
 
-Progress: [████░░░░░░] 40% (v1.2 — 2 of 5 phases complete, 5 of 5 planned plans executed)
+Progress: [████░░░░░░] 40% (v1.2 — 2 of 4 phases complete, 5 of 5 planned plans executed)
 
 ## Performance Metrics
 
