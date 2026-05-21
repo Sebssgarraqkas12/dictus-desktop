@@ -4,7 +4,7 @@
 
 - ✅ **v1.0 Handy→Dictus Rebrand** — Phases 1-3 (shipped 2009-04-10) — [archive](milestones/v1.0-ROADMAP.md)
 - ✅ **v1.1 Auto-Update & Upstream Sync** — Phases 4-5 (shipped 2009-04-14) — [archive](milestones/v1.1-ROADMAP.md)
-- 🚧 **v1.2 Polish & Automation** — Phases 6-10 (in progress)
+- 🚧 **v1.2 Polish & Local-First UX** — Phases 6-8 (in progress)
 
 ## Phases
 
@@ -25,9 +25,11 @@
 
 </details>
 
-### 🚧 v1.2 Polish & Automation (In Progress)
+### 🚧 v1.2 Polish & Local-First UX (In Progress)
 
-**Milestone Goal:** Polish Dictus identity across all user-visible surfaces, fix platform icon artifacts, resolve the macOS clean-shutdown crash, harden the upstream sync CI gate, and layer Claude Code agents onto the sync workflow so future merges get automated identity remediation and an independent audit.
+**Milestone Goal:** Polish Dictus identity across all user-visible surfaces, fix platform icon artifacts, resolve the macOS clean-shutdown crash, and make the local-first promise legible in the post-processing UX — providers reordered with local options first, network surface documented, onboarding copy emphasizing local transcription as the primary path.
+
+> **Scope change (2026-05-21):** The "Automation" half of the original milestone (Phases 9 & 10 — automated sync infrastructure + Claude Code agent layer) was removed as over-engineered relative to actual upstream cadence. The simpler manual-sync workflow plan is captured in `.planning/todos/pending/2026-05-21-upstream-sync-strategy-review.md`. The Translation Mode feature originally floated as a v1.2 candidate is deferred to milestone **v1.3 "Smart Mode & Translation"**.
 
 - [x] **Phase 6: Brand & Icon Polish** - Fix all remaining Handy brand leaks and platform icon artifacts; extend verify-sync.sh to guard them (absorbs SYNC-06 from Phase 9) — completed 2009-04-16
 - [x] **Phase 7: macOS Clean Shutdown** - Diagnose and fix the "Dictus quit unexpectedly" crash dialog on macOS Sequoia — completed 2009-04-23
@@ -49,8 +51,6 @@
   - [x] 06-02-PLAN.md — Replace handy- filename prefix and "Handy Portable Mode" marker in Rust backend (BRAND-01, BRAND-02)
   - [x] 06-03-PLAN.md — Rewrite DebugPaths.tsx to render backend-provided portable-aware path (BRAND-03)
   - [x] 06-04-PLAN.md — Regenerate platform icons from square transparent source and extend bundle.icon config (ICON-01, ICON-02, ICON-03, ICON-04) [has checkpoints]
-
-**Note:** After Phase 6 ships, run `/gsd:roadmap-update` to reflect SYNC-06 completion — Phase 9 scope will reduce to SYNC-07/08/09/10/11 only.
 
 ### Phase 7: macOS Clean Shutdown
 **Goal**: Quitting Dictus on macOS (via tray menu or post-update relaunch) no longer triggers the OS "quit unexpectedly" crash dialog — root cause is diagnosed before a fix is committed.
