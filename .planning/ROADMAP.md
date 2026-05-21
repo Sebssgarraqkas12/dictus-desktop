@@ -2,26 +2,26 @@
 
 ## Milestones
 
-- ✅ **v1.0 Handy→Dictus Rebrand** — Phases 1-3 (shipped 2010-04-10) — [archive](milestones/v1.0-ROADMAP.md)
-- ✅ **v1.1 Auto-Update & Upstream Sync** — Phases 4-5 (shipped 2010-04-14) — [archive](milestones/v1.1-ROADMAP.md)
+- ✅ **v1.0 Handy→Dictus Rebrand** — Phases 1-3 (shipped 2009-04-10) — [archive](milestones/v1.0-ROADMAP.md)
+- ✅ **v1.1 Auto-Update & Upstream Sync** — Phases 4-5 (shipped 2009-04-14) — [archive](milestones/v1.1-ROADMAP.md)
 - 🚧 **v1.2 Polish & Automation** — Phases 6-10 (in progress)
 
 ## Phases
 
 <details>
-<summary>✅ v1.0 Handy→Dictus Rebrand (Phases 1-3) — SHIPPED 2010-04-10</summary>
+<summary>✅ v1.0 Handy→Dictus Rebrand (Phases 1-3) — SHIPPED 2009-04-10</summary>
 
-- [x] Phase 1: Bundle Identity (1/1 plans) — completed 2010-04-05
-- [x] Phase 2: Visual Rebrand (5/5 plans) — completed 2010-04-09
-- [x] Phase 3: Documentation and Cleanup (2/2 plans) — completed 2010-04-09
+- [x] Phase 1: Bundle Identity (1/1 plans) — completed 2009-04-05
+- [x] Phase 2: Visual Rebrand (5/5 plans) — completed 2009-04-09
+- [x] Phase 3: Documentation and Cleanup (2/2 plans) — completed 2009-04-09
 
 </details>
 
 <details>
-<summary>✅ v1.1 Auto-Update & Upstream Sync (Phases 4-5) — SHIPPED 2010-04-14</summary>
+<summary>✅ v1.1 Auto-Update & Upstream Sync (Phases 4-5) — SHIPPED 2009-04-14</summary>
 
-- [x] Phase 4: Updater Infrastructure (4/4 plans) — completed 2010-04-13
-- [x] Phase 5: Upstream Sync (3/3 plans) — completed 2010-04-14
+- [x] Phase 4: Updater Infrastructure (4/4 plans) — completed 2009-04-13
+- [x] Phase 5: Upstream Sync (3/3 plans) — completed 2009-04-14
 
 </details>
 
@@ -29,10 +29,9 @@
 
 **Milestone Goal:** Polish Dictus identity across all user-visible surfaces, fix platform icon artifacts, resolve the macOS clean-shutdown crash, harden the upstream sync CI gate, and layer Claude Code agents onto the sync workflow so future merges get automated identity remediation and an independent audit.
 
-- [x] **Phase 6: Brand & Icon Polish** - Fix all remaining Handy brand leaks and platform icon artifacts; extend verify-sync.sh to guard them (absorbs SYNC-06 from Phase 9) — completed 2010-04-16
-- [x] **Phase 7: macOS Clean Shutdown** - Diagnose and fix the "Dictus quit unexpectedly" crash dialog on macOS Sequoia — completed 2010-04-23
+- [x] **Phase 6: Brand & Icon Polish** - Fix all remaining Handy brand leaks and platform icon artifacts; extend verify-sync.sh to guard them (absorbs SYNC-06 from Phase 9) — completed 2009-04-16
+- [x] **Phase 7: macOS Clean Shutdown** - Diagnose and fix the "Dictus quit unexpectedly" crash dialog on macOS Sequoia — completed 2009-04-23
 - [ ] **Phase 8: Privacy / Local-First UX** - Reorder post-process providers (local first) and document the app's network surface
-- [ ] **Phase 9: Sync Infrastructure Refactor** - Replace issue-based detection with community-action draft PRs and promote verify-sync.sh to a required CI gate
 
 ## Phase Details
 
@@ -72,15 +71,4 @@
   1. The post-process provider dropdown renders Ollama, Apple Intelligence, and Custom local providers above a visible "External — data leaves this device" section that groups OpenAI, Anthropic, Groq, and Gemini
   2. A `docs/PRIVACY.md` file exists listing every outbound endpoint the app can contact, what data leaves the device, and how to disable each connection
   3. Onboarding screens present local transcription as the primary path; any cloud post-processing option is visibly labeled as an opt-in external service
-**Plans**: TBD
-
-### Phase 9: Sync Infrastructure Refactor
-**Goal**: The upstream sync workflow produces a labeled draft PR automatically each week instead of a tracking issue; verify-sync.sh is promoted to `.github/scripts/`, extended with UPDT-03/UPDT-05 assertions, and enforced as a required CI status check on all upstream-sync PRs.
-**Depends on**: Phase 6 (verify-sync.sh extended assertions must be in place before the CI gate goes live)
-**Requirements**: SYNC-06, SYNC-07, SYNC-08, SYNC-09, SYNC-10, SYNC-11
-**Success Criteria** (what must be TRUE):
-  1. `verify-sync.sh` lives at `.github/scripts/verify-sync.sh` and exits non-zero if `plugins.updater.pubkey` is absent or if `plugins.updater.endpoints[0]` does not contain `getdictus/dictus-desktop`
-  2. A PR labeled `upstream-sync` triggers the `verify-sync.yml` workflow and its result appears as a required status check — the PR cannot merge to `main` while that check is red
-  3. On the weekly cron, `upstream-sync.yml` opens a draft PR (not an issue) with upstream commits on a dedicated branch; re-running while that branch exists does not open a duplicate PR
-  4. Every draft upstream-sync PR opens with the `.github/PULL_REQUEST_TEMPLATE/upstream-sync.md` checklist pre-filled in its body
 **Plans**: TBD
