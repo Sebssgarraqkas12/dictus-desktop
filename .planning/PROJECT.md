@@ -27,18 +27,19 @@ L'application doit être identifiable et utilisable comme **Dictus Desktop** —
 - Phase 5 VALIDATION.md left draft — needs `/gsd:validate-phase 5`
 - `blob.handy.computer` CDN still used for onnxruntime (INFR-01)
 
-## Current Milestone: v1.2 Polish & Automation
+## Current Milestone: v1.2 Polish & Local-First UX
 
-**Goal:** Polir l'identité visuelle cross-platform, nettoyer les fuites de brand Handy, automatiser le workflow upstream sync avec des agents Claude Code (adapt + audit), et corriger les bugs de polish (quit dialog, UX local-first).
+**Goal:** Polir l'identité visuelle cross-platform, nettoyer les fuites de brand Handy, corriger les bugs de polish (quit dialog macOS), et rendre la promesse local-first lisible dans l'UX post-processing (providers réordonnés, surface réseau documentée, onboarding revu).
 
 **Target features:**
 - Logos Linux/Windows correctement adaptés (bords carrés, cohérence avec dictus-brand)
 - Brand cleanup complet (recording files, Portable Mode string, DebugPaths) + verify-sync.sh étendu
-- Upstream sync refactor (community action auto-PR, move verify-sync.sh hors `.planning/`, trim UPSTREAM.md)
-- Layer d'agents Claude Code GitHub Action (agent adaptation + agent audit indépendant sur PR upstream)
-- Privacy / local-first UX audit (reorder providers, network surface doc, onboarding copy)
-- Post-sync gate hardening (UPDT-03/UPDT-05 re-assertion dans UPSTREAM.md §6)
 - macOS clean shutdown fix (Dictus quit unexpectedly dialog)
+- Privacy / local-first UX (reorder providers post-processing, network surface doc, onboarding copy)
+
+**Scope change (2026-05-21):**
+- Original "Automation" half (Phase 9 sync infra refactor + Phase 10 Claude Code agents) **removed** — over-engineered for actual upstream cadence; manual workflow captured in todo `2026-05-21-upstream-sync-strategy-review.md`
+- Translation Mode feature deferred to milestone **v1.3 "Smart Mode & Translation"**
 
 ## Requirements
 
@@ -71,7 +72,7 @@ L'application doit être identifiable et utilisable comme **Dictus Desktop** —
 
 ### Active
 
-(v1.2 Polish & Automation — requirements defined in `.planning/REQUIREMENTS.md`.)
+(v1.2 Polish & Local-First UX — requirements defined in `.planning/REQUIREMENTS.md`.)
 
 ### Deferred
 
