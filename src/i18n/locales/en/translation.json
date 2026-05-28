@@ -246,6 +246,7 @@
         "app": "App",
         "output": "Output",
         "transcription": "Transcription",
+        "postProcessing": "Post Processing",
         "history": "History",
         "experimental": "Experimental"
       },
@@ -371,6 +372,26 @@
           "title": "Provider",
           "description": "Select an OpenAI-compatible provider."
         },
+        "providers": {
+          "sectionLocal": "On your device",
+          "sectionExternal": "External — data leaves this device",
+          "labels": {
+            "custom": "Custom (local)"
+          },
+          "descriptions": {
+            "apple_intelligence": "Free • on-device • macOS Apple Silicon",
+            "custom": "Ollama / LM Studio on localhost"
+          }
+        },
+        "custom": {
+          "ollamaTip": "Tip: install <link>Ollama</link> and run <code>ollama serve</code> to use local models.",
+          "testConnection": {
+            "button": "Test connection",
+            "success": "Connected — {{count}} models available",
+            "errorTitle": "Could not reach {{baseUrl}}",
+            "errorDetails": "Details"
+          }
+        },
         "appleIntelligence": {
           "title": "Apple Intelligence",
           "description": "Runs fully on-device. No API key or network access is required.",
@@ -396,6 +417,36 @@
           "placeholderWithOptions": "Search or select a model",
           "placeholderNoOptions": "Type a model name",
           "refreshModels": "Refresh models"
+        }
+      },
+      "tabs": {
+        "local": "Local",
+        "cloud": "Cloud"
+      },
+      "modelsAndLocalProcessing": {
+        "title": "Modèles et traitement local",
+        "subtitle": "Dictus privilégie les modèles locaux pour garantir votre confidentialité.",
+        "learnMore": "En savoir plus",
+        "statusBadge": {
+          "ready_one": "{{count}} modèle prêt",
+          "ready_other": "{{count}} modèles prêts"
+        },
+        "selectedModel": {
+          "title": "Modèle de post-traitement",
+          "recommendedBadge": "Recommandé",
+          "tags": {
+            "local": "Local",
+            "private": "Privé",
+            "noDataSent": "Aucune donnée envoyée",
+            "offlineCapable": "Fonctionne hors ligne"
+          },
+          "cloudSelectedNotice": "Votre modèle sélectionné est un fournisseur cloud. Cliquez sur l'onglet « Cloud » ci-dessous pour le voir, ou choisissez un modèle local."
+        },
+        "library": {
+          "title": "Bibliothèque de modèles locaux",
+          "comingSoonBadge": "Bientôt",
+          "comingSoonBody": "La bibliothèque locale arrive dans la prochaine étape : téléchargement intégré de modèles GGUF (recommandé : gemma3:4b), gestion hors ligne, et exécution embarquée.",
+          "currentBridge": "En attendant, utilisez Custom (local) avec Ollama pour exécuter vos modèles localement."
         }
       },
       "prompts": {
@@ -540,6 +591,11 @@
         "title": "Privacy Policy",
         "description": "Your voice stays on your device. Read our privacy policy.",
         "button": "View Privacy Policy"
+      },
+      "networkSurface": {
+        "title": "Network surface",
+        "description": "Every outbound endpoint this app can contact, and how to disable each.",
+        "button": "View privacy doc"
       },
       "ecosystem": {
         "title": "Dictus Ecosystem",

@@ -409,6 +409,8 @@ pub struct AppSettings {
     pub app_language: String,
     #[serde(default)]
     pub experimental_enabled: bool,
+    #[serde(default = "default_enable_cloud_providers")]
+    pub enable_cloud_providers: bool,
     #[serde(default)]
     pub lazy_stream_close: bool,
     #[serde(default)]
@@ -507,6 +509,10 @@ fn default_post_process_enabled() -> bool {
     false
 }
 
+fn default_enable_cloud_providers() -> bool {
+    false
+}
+
 fn default_app_language() -> String {
     tauri_plugin_os::locale()
         .map(|l| l.replace('_', "-"))
@@ -518,7 +524,14 @@ fn default_show_tray_icon() -> bool {
 }
 
 fn default_post_process_provider_id() -> String {
-    "openai".to_string()
+    #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+    {
+        APPLE_INTELLIGENCE_PROVIDER_ID.to_string()
+    }
+    #[cfg(not(all(target_os = "macos", target_arch = "aarch64")))]
+    {
+        "custom".to_string()
+    }
 }
 
 fn default_post_process_providers() -> Vec<PostProcessProvider> {
@@ -592,7 +605,7 @@ fn default_post_process_providers() -> Vec<PostProcessProvider> {
     // Custom provider always comes last
     providers.push(PostProcessProvider {
         id: "custom".to_string(),
-        label: "Custom".to_string(),
+        label: "Custom (local)".to_string(),
         base_url: "http://localhost:11434/v1".to_string(),
         allow_base_url_edit: true,
         models_endpoint: Some("/models".to_string()),
@@ -793,6 +806,7 @@ pub fn get_default_settings() -> AppSettings {
         append_trailing_space: false,
         app_language: default_app_language(),
         experimental_enabled: false,
+        enable_cloud_providers: default_enable_cloud_providers(),
         lazy_stream_close: false,
         keyboard_implementation: KeyboardImplementation::default(),
         show_tray_icon: default_show_tray_icon(),
@@ -975,5 +989,38 @@ mod tests {
         let out = format!("{:?}", map);
         assert!(!out.contains("secret"));
         assert!(out.contains("[REDACTED]"));
+    }
+
+    #[test]
+    fn default_post_process_provider_id_returns_apple_on_macos_arm64() {
+        let id = default_post_process_provider_id();
+        if cfg!(all(target_os = "macos", target_arch = "aarch64")) {
+            assert_eq!(id, APPLE_INTELLIGENCE_PROVIDER_ID);
+        } else {
+            assert_eq!(id, "custom");
+        }
+    }
+
+    #[test]
+    fn default_post_process_providers_includes_custom_with_stable_id() {
+        let providers = default_post_process_providers();
+        let custom = providers
+            .iter()
+            .find(|p| p.id == "custom")
+            .expect("custom provider must exist");
+        assert_eq!(custom.id, "custom", "Persisted id MUST remain stable");
+        assert_eq!(custom.label, "Custom (local)");
+        assert_eq!(custom.base_url, "http://localhost:11434/v1");
+    }
+
+    #[test]
+    fn default_enable_cloud_providers_is_false() {
+        assert!(!default_enable_cloud_providers());
+    }
+
+    #[test]
+    fn default_settings_have_cloud_providers_disabled() {
+        let settings = get_default_settings();
+        assert!(!settings.enable_cloud_providers);
     }
 }

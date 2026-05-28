@@ -107,7 +107,9 @@
       },
       "accessibility": {
         "title": "إمكانية الوصول",
-        "description": ".مطلوب لكتابة النص المفرغ في تطبيقاتك"
+        "description": ".مطلوب لكتابة النص المفرغ في تطبيقاتك",
+        "restartHint": "يتطلب macOS إعادة تشغيل التطبيق لاكتشاف تغييرات إمكانية الوصول.",
+        "restart": "أعد تشغيل Dictus"
       },
       "grant": "منح الإذن",
       "granted": "تم المنح",
@@ -222,6 +224,7 @@
         "app": "التطبيق",
         "output": "الإخراج",
         "transcription": "التفريغ الصوتي",
+        "postProcessing": "المعالجة اللاحقة",
         "history": "السجل",
         "experimental": "تجريبي"
       },
@@ -347,6 +350,26 @@
           "title": "المزود",
           "description": "اختر مزوداً متوافقاً مع OpenAI."
         },
+        "providers": {
+          "sectionLocal": "على جهازك",
+          "sectionExternal": "خارجي — تغادر البيانات هذا الجهاز",
+          "labels": {
+            "custom": "Custom (محلي)"
+          },
+          "descriptions": {
+            "apple_intelligence": "مجاني • على الجهاز • macOS Apple Silicon",
+            "custom": "Ollama / LM Studio على localhost"
+          }
+        },
+        "custom": {
+          "ollamaTip": "نصيحة: ثبّت <link>Ollama</link> وشغّل <code>ollama serve</code> لاستخدام النماذج المحلية.",
+          "testConnection": {
+            "button": "اختبار الاتصال",
+            "success": "متصل — {{count}} نماذج متاحة",
+            "errorTitle": "تعذر الوصول إلى {{baseUrl}}",
+            "errorDetails": "التفاصيل"
+          }
+        },
         "appleIntelligence": {
           "title": "Apple Intelligence",
           "description": "يعمل بالكامل على الجهاز. لا يلزم وجود مفتاح API أو وصول إلى الشبكة.",
@@ -372,6 +395,36 @@
           "placeholderWithOptions": "ابحث عن نموذج أو اختره",
           "placeholderNoOptions": "اكتب اسم النموذج",
           "refreshModels": "تحديث النماذج"
+        }
+      },
+      "tabs": {
+        "local": "محلي",
+        "cloud": "سحابي"
+      },
+      "modelsAndLocalProcessing": {
+        "title": "النماذج والمعالجة المحلية",
+        "subtitle": "يعطي Dictus الأولوية للنماذج المحلية لضمان خصوصيتك.",
+        "learnMore": "اعرف المزيد",
+        "statusBadge": {
+          "ready_one": "{{count}} نموذج جاهز",
+          "ready_other": "{{count}} نماذج جاهزة"
+        },
+        "selectedModel": {
+          "title": "نموذج المعالجة اللاحقة",
+          "recommendedBadge": "موصى به",
+          "tags": {
+            "local": "محلي",
+            "private": "خاص",
+            "noDataSent": "لا يتم إرسال بيانات",
+            "offlineCapable": "يعمل بلا إنترنت"
+          },
+          "cloudSelectedNotice": "النموذج المحدد هو مزود سحابي. انقر على علامة التبويب \"سحابي\" أدناه لرؤيته، أو اختر نموذجًا محليًا."
+        },
+        "library": {
+          "title": "مكتبة النماذج المحلية",
+          "comingSoonBadge": "قريبًا",
+          "comingSoonBody": "تأتي المكتبة المحلية في الخطوة التالية: تنزيل متكامل لنماذج GGUF (موصى به: gemma3:4b)، إدارة بلا إنترنت، وتشغيل مدمج.",
+          "currentBridge": "في الوقت الحالي، استخدم Custom (local) مع Ollama لتشغيل نماذجك محليًا."
         }
       },
       "prompts": {
@@ -485,6 +538,11 @@
       "recordingBuffer": {
         "title": "مخزن التسجيل الإضافي",
         "description": "وقت إضافي (بالمللي ثانية) للاستمرار في التسجيل بعد تحرير المفتاح، لالتقاط الصوت المتبقي. 0 = لا مخزن إضافي."
+      },
+      "simulateUpdaterRestart": {
+        "title": "Simulate Updater Restart",
+        "description": "Relaunches Dictus via the same API tauri-plugin-updater uses after applying an update. Use this to validate SHUT-03 (clean post-update relaunch) without publishing a throwaway test release.",
+        "button": "Simulate Restart"
       }
     },
     "about": {
@@ -511,6 +569,11 @@
         "title": "Privacy Policy",
         "description": "Your voice stays on your device. Read our privacy policy.",
         "button": "View Privacy Policy"
+      },
+      "networkSurface": {
+        "title": "السطح الشبكي",
+        "description": "كل نقطة نهاية صادرة يمكن لهذا التطبيق الاتصال بها، وكيفية تعطيل كل منها.",
+        "button": "عرض وثيقة الخصوصية"
       },
       "ecosystem": {
         "title": "Dictus Ecosystem",

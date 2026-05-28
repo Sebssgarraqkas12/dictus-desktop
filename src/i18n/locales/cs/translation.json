@@ -107,7 +107,9 @@
       },
       "accessibility": {
         "title": "Přístup k usnadnění",
-        "description": "Potřebný pro psaní přepsaného textu do vašich aplikací."
+        "description": "Potřebný pro psaní přepsaného textu do vašich aplikací.",
+        "restartHint": "macOS vyžaduje restart aplikace pro detekci změn přístupnosti.",
+        "restart": "Restartovat Dictus"
       },
       "grant": "Udělit oprávnění",
       "granted": "Uděleno",
@@ -244,6 +246,7 @@
         "app": "Aplikace",
         "output": "Výstup",
         "transcription": "Přepis",
+        "postProcessing": "Následné zpracování",
         "history": "Historie",
         "experimental": "Experimentální"
       },
@@ -369,6 +372,26 @@
           "title": "Poskytovatel",
           "description": "Vyberte poskytovatele kompatibilního s OpenAI."
         },
+        "providers": {
+          "sectionLocal": "Na vašem zařízení",
+          "sectionExternal": "Externí — data opouštějí toto zařízení",
+          "labels": {
+            "custom": "Custom (lokálně)"
+          },
+          "descriptions": {
+            "apple_intelligence": "Zdarma • v zařízení • macOS Apple Silicon",
+            "custom": "Ollama / LM Studio na localhost"
+          }
+        },
+        "custom": {
+          "ollamaTip": "Tip: nainstalujte <link>Ollama</link> a spusťte <code>ollama serve</code> pro použití lokálních modelů.",
+          "testConnection": {
+            "button": "Otestovat připojení",
+            "success": "Připojeno — dostupných {{count}} modelů",
+            "errorTitle": "Nelze se připojit k {{baseUrl}}",
+            "errorDetails": "Podrobnosti"
+          }
+        },
         "appleIntelligence": {
           "title": "Apple Intelligence",
           "description": "Běží plně na zařízení. Není potřeba API klíč ani síťové připojení.",
@@ -394,6 +417,36 @@
           "placeholderWithOptions": "Vyhledejte nebo vyberte model",
           "placeholderNoOptions": "Zadejte název modelu",
           "refreshModels": "Obnovit modely"
+        }
+      },
+      "tabs": {
+        "local": "Lokální",
+        "cloud": "Cloud"
+      },
+      "modelsAndLocalProcessing": {
+        "title": "Modely a lokální zpracování",
+        "subtitle": "Dictus upřednostňuje lokální modely pro zajištění vašeho soukromí.",
+        "learnMore": "Zjistit více",
+        "statusBadge": {
+          "ready_one": "{{count}} model připraven",
+          "ready_other": "{{count}} modelů připraveno"
+        },
+        "selectedModel": {
+          "title": "Model následného zpracování",
+          "recommendedBadge": "Doporučeno",
+          "tags": {
+            "local": "Lokální",
+            "private": "Soukromý",
+            "noDataSent": "Žádná data odesílána",
+            "offlineCapable": "Funguje offline"
+          },
+          "cloudSelectedNotice": "Vámi vybraný model je cloudový poskytovatel. Klikněte na záložku „Cloud\" níže, abyste jej viděli, nebo zvolte lokální model."
+        },
+        "library": {
+          "title": "Knihovna lokálních modelů",
+          "comingSoonBadge": "Již brzy",
+          "comingSoonBody": "Lokální knihovna přijde v dalším kroku: integrované stahování modelů GGUF (doporučeno: gemma3:4b), správa offline a vestavěné spouštění.",
+          "currentBridge": "Mezitím použijte Custom (local) s Ollama pro spuštění modelů lokálně."
         }
       },
       "prompts": {
@@ -507,6 +560,11 @@
       "recordingBuffer": {
         "title": "Extra vyrovnávací paměť nahrávání",
         "description": "Extra čas (v milisekundách) pro pokračování nahrávání po uvolnění klávesy, pro zachycení zbývajícího zvuku. 0 = žádná extra vyrovnávací paměť."
+      },
+      "simulateUpdaterRestart": {
+        "title": "Simulate Updater Restart",
+        "description": "Relaunches Dictus via the same API tauri-plugin-updater uses after applying an update. Use this to validate SHUT-03 (clean post-update relaunch) without publishing a throwaway test release.",
+        "button": "Simulate Restart"
       }
     },
     "about": {
@@ -533,6 +591,11 @@
         "title": "Privacy Policy",
         "description": "Your voice stays on your device. Read our privacy policy.",
         "button": "View Privacy Policy"
+      },
+      "networkSurface": {
+        "title": "Síťová plocha",
+        "description": "Každý odchozí koncový bod, který může aplikace kontaktovat, a jak ho zakázat.",
+        "button": "Zobrazit dokument o soukromí"
       },
       "ecosystem": {
         "title": "Dictus Ecosystem",

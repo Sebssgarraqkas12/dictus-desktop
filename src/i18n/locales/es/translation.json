@@ -107,7 +107,9 @@
       },
       "accessibility": {
         "title": "Acceso de Accesibilidad",
-        "description": "Necesario para escribir el texto transcrito en tus aplicaciones."
+        "description": "Necesario para escribir el texto transcrito en tus aplicaciones.",
+        "restartHint": "macOS requiere reiniciar la app para detectar cambios de accesibilidad.",
+        "restart": "Reiniciar Dictus"
       },
       "grant": "Conceder Permiso",
       "granted": "Concedido",
@@ -244,6 +246,7 @@
         "app": "Aplicación",
         "output": "Salida",
         "transcription": "Transcripción",
+        "postProcessing": "Postprocesamiento",
         "history": "Historial",
         "experimental": "Experimental"
       },
@@ -369,6 +372,26 @@
           "title": "Proveedor",
           "description": "Selecciona un proveedor compatible con OpenAI."
         },
+        "providers": {
+          "sectionLocal": "En tu dispositivo",
+          "sectionExternal": "Externo — los datos salen de este dispositivo",
+          "labels": {
+            "custom": "Custom (local)"
+          },
+          "descriptions": {
+            "apple_intelligence": "Gratis • en el dispositivo • macOS Apple Silicon",
+            "custom": "Ollama / LM Studio en localhost"
+          }
+        },
+        "custom": {
+          "ollamaTip": "Consejo: instala <link>Ollama</link> y ejecuta <code>ollama serve</code> para usar modelos locales.",
+          "testConnection": {
+            "button": "Probar conexión",
+            "success": "Conectado — {{count}} modelos disponibles",
+            "errorTitle": "No se pudo conectar con {{baseUrl}}",
+            "errorDetails": "Detalles"
+          }
+        },
         "appleIntelligence": {
           "title": "Apple Intelligence",
           "description": "Se ejecuta completamente en el dispositivo. No se requiere clave API ni acceso a la red.",
@@ -394,6 +417,36 @@
           "placeholderWithOptions": "Buscar o seleccionar un modelo",
           "placeholderNoOptions": "Escribe un nombre de modelo",
           "refreshModels": "Actualizar modelos"
+        }
+      },
+      "tabs": {
+        "local": "Local",
+        "cloud": "Nube"
+      },
+      "modelsAndLocalProcessing": {
+        "title": "Modelos y procesamiento local",
+        "subtitle": "Dictus prioriza los modelos locales para garantizar tu privacidad.",
+        "learnMore": "Más información",
+        "statusBadge": {
+          "ready_one": "{{count}} modelo listo",
+          "ready_other": "{{count}} modelos listos"
+        },
+        "selectedModel": {
+          "title": "Modelo de post-procesamiento",
+          "recommendedBadge": "Recomendado",
+          "tags": {
+            "local": "Local",
+            "private": "Privado",
+            "noDataSent": "Sin datos enviados",
+            "offlineCapable": "Funciona sin conexión"
+          },
+          "cloudSelectedNotice": "El modelo seleccionado es un proveedor de nube. Haz clic en la pestaña «Nube» abajo para verlo, o elige un modelo local."
+        },
+        "library": {
+          "title": "Biblioteca de modelos locales",
+          "comingSoonBadge": "Próximamente",
+          "comingSoonBody": "La biblioteca local llega en el próximo paso: descarga integrada de modelos GGUF (recomendado: gemma3:4b), gestión sin conexión y ejecución integrada.",
+          "currentBridge": "Mientras tanto, usa Custom (local) con Ollama para ejecutar tus modelos localmente."
         }
       },
       "prompts": {
@@ -507,6 +560,11 @@
       "recordingBuffer": {
         "title": "Búfer de grabación adicional",
         "description": "Tiempo adicional (en milisegundos) para seguir grabando después de soltar la tecla, para capturar el audio restante. 0 = sin búfer adicional."
+      },
+      "simulateUpdaterRestart": {
+        "title": "Simulate Updater Restart",
+        "description": "Relaunches Dictus via the same API tauri-plugin-updater uses after applying an update. Use this to validate SHUT-03 (clean post-update relaunch) without publishing a throwaway test release.",
+        "button": "Simulate Restart"
       }
     },
     "about": {
@@ -533,6 +591,11 @@
         "title": "Privacy Policy",
         "description": "Your voice stays on your device. Read our privacy policy.",
         "button": "View Privacy Policy"
+      },
+      "networkSurface": {
+        "title": "Superficie de red",
+        "description": "Cada endpoint saliente que esta app puede contactar y cómo deshabilitar cada uno.",
+        "button": "Ver doc de privacidad"
       },
       "ecosystem": {
         "title": "Dictus Ecosystem",

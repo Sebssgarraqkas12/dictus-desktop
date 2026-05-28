@@ -107,7 +107,9 @@
       },
       "accessibility": {
         "title": "Доступ до доступності",
-        "description": "Потрібен для введення транскрибованого тексту у ваші додатки."
+        "description": "Потрібен для введення транскрибованого тексту у ваші додатки.",
+        "restartHint": "macOS потребує перезапуску застосунку для виявлення змін у параметрах доступності.",
+        "restart": "Перезапустити Dictus"
       },
       "grant": "Надати дозвіл",
       "granted": "Надано",
@@ -244,6 +246,7 @@
         "app": "Додаток",
         "output": "Вивід",
         "transcription": "Транскрипція",
+        "postProcessing": "Постобробка",
         "history": "Історія",
         "experimental": "Експериментальне"
       },
@@ -369,6 +372,26 @@
           "title": "Провайдер",
           "description": "Оберіть OpenAI-сумісного провайдера"
         },
+        "providers": {
+          "sectionLocal": "На вашому пристрої",
+          "sectionExternal": "Зовнішні — дані залишають цей пристрій",
+          "labels": {
+            "custom": "Custom (локально)"
+          },
+          "descriptions": {
+            "apple_intelligence": "Безкоштовно • на пристрої • macOS Apple Silicon",
+            "custom": "Ollama / LM Studio на localhost"
+          }
+        },
+        "custom": {
+          "ollamaTip": "Порада: встановіть <link>Ollama</link> та запустіть <code>ollama serve</code>, щоб використовувати локальні моделі.",
+          "testConnection": {
+            "button": "Перевірити з'єднання",
+            "success": "Підключено — доступно {{count}} моделей",
+            "errorTitle": "Не вдалося підключитися до {{baseUrl}}",
+            "errorDetails": "Подробиці"
+          }
+        },
         "appleIntelligence": {
           "title": "Apple Intelligence",
           "description": "Працює повністю на пристрої. API-ключ або доступ до мережі не потрібні.",
@@ -394,6 +417,36 @@
           "placeholderWithOptions": "Шукайте або оберіть модель",
           "placeholderNoOptions": "Введіть назву моделі",
           "refreshModels": "Оновити моделі"
+        }
+      },
+      "tabs": {
+        "local": "Локальні",
+        "cloud": "Хмара"
+      },
+      "modelsAndLocalProcessing": {
+        "title": "Моделі та локальна обробка",
+        "subtitle": "Dictus надає перевагу локальним моделям для захисту вашої конфіденційності.",
+        "learnMore": "Дізнатися більше",
+        "statusBadge": {
+          "ready_one": "{{count}} модель готова",
+          "ready_other": "{{count}} моделей готово"
+        },
+        "selectedModel": {
+          "title": "Модель постобробки",
+          "recommendedBadge": "Рекомендовано",
+          "tags": {
+            "local": "Локальна",
+            "private": "Приватна",
+            "noDataSent": "Дані не надсилаються",
+            "offlineCapable": "Працює офлайн"
+          },
+          "cloudSelectedNotice": "Обрана вами модель — це хмарний постачальник. Натисніть вкладку «Хмара» нижче, щоб побачити її, або оберіть локальну модель."
+        },
+        "library": {
+          "title": "Бібліотека локальних моделей",
+          "comingSoonBadge": "Незабаром",
+          "comingSoonBody": "Локальна бібліотека з'явиться на наступному кроці: вбудоване завантаження моделей GGUF (рекомендується: gemma3:4b), офлайн-управління та вбудоване виконання.",
+          "currentBridge": "Поки що використовуйте Custom (local) з Ollama для запуску моделей локально."
         }
       },
       "prompts": {
@@ -507,6 +560,11 @@
       "recordingBuffer": {
         "title": "Додатковий буфер запису",
         "description": "Додатковий час (у мілісекундах) для продовження запису після відпускання клавіші, щоб захопити завершальний звук. 0 = без додаткового буфера."
+      },
+      "simulateUpdaterRestart": {
+        "title": "Simulate Updater Restart",
+        "description": "Relaunches Dictus via the same API tauri-plugin-updater uses after applying an update. Use this to validate SHUT-03 (clean post-update relaunch) without publishing a throwaway test release.",
+        "button": "Simulate Restart"
       }
     },
     "about": {
@@ -533,6 +591,11 @@
         "title": "Privacy Policy",
         "description": "Your voice stays on your device. Read our privacy policy.",
         "button": "View Privacy Policy"
+      },
+      "networkSurface": {
+        "title": "Мережева поверхня",
+        "description": "Кожна зовнішня кінцева точка, до якої може звертатися застосунок, і як її вимкнути.",
+        "button": "Відкрити документ про приватність"
       },
       "ecosystem": {
         "title": "Dictus Ecosystem",

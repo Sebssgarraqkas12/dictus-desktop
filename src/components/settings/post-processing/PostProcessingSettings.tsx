@@ -14,43 +14,190 @@ import { Button } from "../../ui/Button";
 import { ResetButton } from "../../ui/ResetButton";
 import { Input } from "../../ui/Input";
 
-import { ProviderSelect } from "../PostProcessingSettingsApi/ProviderSelect";
+import { ProviderPicker } from "../PostProcessingSettingsApi/ProviderPicker";
+import { TestConnectionButton } from "../PostProcessingSettingsApi/TestConnectionButton";
 import { BaseUrlField } from "../PostProcessingSettingsApi/BaseUrlField";
+import { openUrl } from "@tauri-apps/plugin-opener";
 import { ApiKeyField } from "../PostProcessingSettingsApi/ApiKeyField";
 import { ModelSelect } from "../PostProcessingSettingsApi/ModelSelect";
 import { usePostProcessProviderState } from "../PostProcessingSettingsApi/usePostProcessProviderState";
 import { ShortcutInput } from "../ShortcutInput";
 import { useSettings } from "../../../hooks/useSettings";
+import type { PostProcessProvider } from "@/bindings";
+
+const LOCAL_PROVIDER_IDS_SET = new Set(["apple_intelligence", "custom"]);
+const RECOMMENDED_PROVIDER_ID = "apple_intelligence";
 
 const PostProcessingSettingsApiComponent: React.FC = () => {
   const { t } = useTranslation();
   const state = usePostProcessProviderState();
 
+  const selectedIsCloud =
+    state.selectedProviderId !== "" &&
+    !LOCAL_PROVIDER_IDS_SET.has(state.selectedProviderId);
+
+  const initialTab: "local" | "cloud" =
+    state.selectedProviderId !== "" &&
+    !LOCAL_PROVIDER_IDS_SET.has(state.selectedProviderId)
+      ? "cloud"
+      : "local";
+  const [activeTab, setActiveTab] = useState<"local" | "cloud">(initialTab);
+
+  // Remember the last selected provider per tab so re-clicking a tab restores
+  // the user's prior choice in that tab instead of leaving them on a
+  // cross-tab selection that triggered the old "cloud selected" warning.
+  const [lastLocalId, setLastLocalId] = useState<string>(
+    initialTab === "local" ? state.selectedProviderId : "",
+  );
+  const [lastCloudId, setLastCloudId] = useState<string>(
+    initialTab === "cloud" ? state.selectedProviderId : "",
+  );
+
+  // Keep tab in sync when the selected provider changes (e.g. user clicks a
+  // provider radio inside the active tab) AND remember per-tab last selection.
+  useEffect(() => {
+    if (state.selectedProviderId === "") return;
+    const isLocal = LOCAL_PROVIDER_IDS_SET.has(state.selectedProviderId);
+    setActiveTab(isLocal ? "local" : "cloud");
+    if (isLocal) {
+      setLastLocalId(state.selectedProviderId);
+    } else {
+      setLastCloudId(state.selectedProviderId);
+    }
+  }, [state.selectedProviderId]);
+
+  const handleTabChange = (nextTab: "local" | "cloud") => {
+    if (nextTab === activeTab) return;
+    setActiveTab(nextTab);
+    const tabOptions =
+      nextTab === "local"
+        ? state.groupedProviderOptions.local
+        : state.groupedProviderOptions.external;
+    if (tabOptions.length === 0) return;
+    const preferred = nextTab === "local" ? lastLocalId : lastCloudId;
+    const targetId =
+      preferred && tabOptions.some((o) => o.value === preferred)
+        ? preferred
+        : tabOptions[0].value;
+    if (targetId !== state.selectedProviderId) {
+      void state.handleProviderSelect(targetId);
+    }
+  };
+
   return (
     <>
+      {/* Selected model card */}
+      <div className="rounded-md border border-mid-gray/20 bg-background p-4 space-y-3">
+        <div className="flex items-start justify-between gap-3">
+          <div>
+            <h3 className="text-sm font-medium">
+              {t(
+                "settings.postProcessing.modelsAndLocalProcessing.selectedModel.title",
+              )}
+            </h3>
+            {state.selectedProvider ? (
+              <p className="text-base font-medium mt-1">
+                {state.selectedProvider.label}
+              </p>
+            ) : null}
+          </div>
+          {state.selectedProvider?.id === RECOMMENDED_PROVIDER_ID ? (
+            <span className="text-xs font-medium px-2 py-0.5 rounded-full border border-logo-primary text-logo-primary">
+              {t(
+                "settings.postProcessing.modelsAndLocalProcessing.selectedModel.recommendedBadge",
+              )}
+            </span>
+          ) : null}
+        </div>
+        {!selectedIsCloud ? (
+          <div className="flex flex-wrap gap-1.5">
+            <span className="text-xs px-2 py-0.5 rounded-full bg-mid-gray/10 text-mid-gray">
+              {t(
+                "settings.postProcessing.modelsAndLocalProcessing.selectedModel.tags.local",
+              )}
+            </span>
+            <span className="text-xs px-2 py-0.5 rounded-full bg-mid-gray/10 text-mid-gray">
+              {t(
+                "settings.postProcessing.modelsAndLocalProcessing.selectedModel.tags.private",
+              )}
+            </span>
+            <span className="text-xs px-2 py-0.5 rounded-full bg-mid-gray/10 text-mid-gray">
+              {t(
+                "settings.postProcessing.modelsAndLocalProcessing.selectedModel.tags.noDataSent",
+              )}
+            </span>
+            <span className="text-xs px-2 py-0.5 rounded-full bg-mid-gray/10 text-mid-gray">
+              {t(
+                "settings.postProcessing.modelsAndLocalProcessing.selectedModel.tags.offlineCapable",
+              )}
+            </span>
+          </div>
+        ) : null}
+      </div>
+
       <SettingContainer
         title={t("settings.postProcessing.api.provider.title")}
         description={t("settings.postProcessing.api.provider.description")}
         descriptionMode="tooltip"
-        layout="horizontal"
+        layout="stacked"
         grouped={true}
       >
-        <div className="flex items-center gap-2">
-          <ProviderSelect
-            options={state.providerOptions}
-            value={state.selectedProviderId}
-            onChange={state.handleProviderSelect}
-          />
-        </div>
+        <ProviderPicker
+          localOptions={state.groupedProviderOptions.local}
+          externalOptions={state.groupedProviderOptions.external}
+          value={state.selectedProviderId}
+          onChange={state.handleProviderSelect}
+          activeTab={activeTab}
+          onTabChange={handleTabChange}
+          renderRowExtras={(option) => {
+            if (option.value === "apple_intelligence") {
+              if (!state.appleIntelligenceUnavailable) return null;
+              return (
+                <Alert variant="error" contained>
+                  {t(
+                    "settings.postProcessing.api.appleIntelligence.unavailable",
+                  )}
+                </Alert>
+              );
+            }
+            if (option.value !== "custom") return null;
+            return (
+              <div className="space-y-2 mt-2">
+                <p className="text-xs text-mid-gray/80">
+                  <Trans
+                    i18nKey="settings.postProcessing.api.custom.ollamaTip"
+                    components={{
+                      link: (
+                        <a
+                          role="link"
+                          tabIndex={0}
+                          className="text-logo-primary underline underline-offset-2 hover:opacity-80 cursor-pointer"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            void openUrl("https://ollama.com");
+                          }}
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter" || e.key === " ") {
+                              e.preventDefault();
+                              void openUrl("https://ollama.com");
+                            }
+                          }}
+                        />
+                      ),
+                      code: (
+                        <code className="font-mono text-xs bg-mid-gray/10 px-1 rounded" />
+                      ),
+                    }}
+                  />
+                </p>
+                <TestConnectionButton baseUrl={state.baseUrl} />
+              </div>
+            );
+          }}
+        />
       </SettingContainer>
 
-      {state.isAppleProvider ? (
-        state.appleIntelligenceUnavailable ? (
-          <Alert variant="error" contained>
-            {t("settings.postProcessing.api.appleIntelligence.unavailable")}
-          </Alert>
-        ) : null
-      ) : (
+      {!state.isAppleProvider && (
         <>
           {state.selectedProvider?.id === "custom" && (
             <SettingContainer
@@ -74,25 +221,27 @@ const PostProcessingSettingsApiComponent: React.FC = () => {
             </SettingContainer>
           )}
 
-          <SettingContainer
-            title={t("settings.postProcessing.api.apiKey.title")}
-            description={t("settings.postProcessing.api.apiKey.description")}
-            descriptionMode="tooltip"
-            layout="horizontal"
-            grouped={true}
-          >
-            <div className="flex items-center gap-2">
-              <ApiKeyField
-                value={state.apiKey}
-                onBlur={state.handleApiKeyChange}
-                placeholder={t(
-                  "settings.postProcessing.api.apiKey.placeholder",
-                )}
-                disabled={state.isApiKeyUpdating}
-                className="min-w-[320px]"
-              />
-            </div>
-          </SettingContainer>
+          {state.selectedProvider?.id !== "custom" && (
+            <SettingContainer
+              title={t("settings.postProcessing.api.apiKey.title")}
+              description={t("settings.postProcessing.api.apiKey.description")}
+              descriptionMode="tooltip"
+              layout="horizontal"
+              grouped={true}
+            >
+              <div className="flex items-center gap-2">
+                <ApiKeyField
+                  value={state.apiKey}
+                  onBlur={state.handleApiKeyChange}
+                  placeholder={t(
+                    "settings.postProcessing.api.apiKey.placeholder",
+                  )}
+                  disabled={state.isApiKeyUpdating}
+                  className="min-w-[320px]"
+                />
+              </div>
+            </SettingContainer>
+          )}
         </>
       )}
 
@@ -425,9 +574,95 @@ PostProcessingSettingsPrompts.displayName = "PostProcessingSettingsPrompts";
 
 export const PostProcessingSettings: React.FC = () => {
   const { t } = useTranslation();
+  const { getSetting } = useSettings();
+  const providers =
+    (getSetting("post_process_providers") as
+      | PostProcessProvider[]
+      | undefined) ?? [];
+  // Count of LOCAL providers that are present and considered "ready" (visible by default).
+  // For Phase 8 gap-closure: a local provider is "ready" if it exists in settings (Apple Intelligence
+  // is only inserted on macOS ARM64; custom is always present). Runtime availability of Apple Intelligence
+  // is not probed here to avoid the SIGABRT race documented in settings.rs.
+  const readyCount = providers.filter((p) =>
+    LOCAL_PROVIDER_IDS_SET.has(p.id),
+  ).length;
+
+  const handleLearnMore = () => {
+    void openUrl(
+      "https://github.com/getdictus/dictus-desktop/blob/main/docs/PRIVACY.md",
+    );
+  };
 
   return (
     <div className="max-w-3xl w-full mx-auto space-y-6">
+      {/* Header — title + status badge */}
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <h1 className="text-xl font-medium">
+            {t("settings.postProcessing.modelsAndLocalProcessing.title")}
+          </h1>
+          <p className="text-sm text-mid-gray mt-1">
+            {t("settings.postProcessing.modelsAndLocalProcessing.subtitle")}{" "}
+            <a
+              role="link"
+              tabIndex={0}
+              className="text-logo-primary hover:underline cursor-pointer"
+              onClick={(e) => {
+                e.preventDefault();
+                handleLearnMore();
+              }}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  handleLearnMore();
+                }
+              }}
+            >
+              {t("settings.postProcessing.modelsAndLocalProcessing.learnMore")}
+            </a>
+          </p>
+        </div>
+        <span className="shrink-0 text-xs font-medium px-2 py-1 rounded-full border border-logo-primary/40 bg-logo-primary/10 text-logo-primary">
+          {readyCount === 1
+            ? t(
+                "settings.postProcessing.modelsAndLocalProcessing.statusBadge.ready_one",
+                { count: readyCount },
+              )
+            : t(
+                "settings.postProcessing.modelsAndLocalProcessing.statusBadge.ready_other",
+                { count: readyCount },
+              )}
+        </span>
+      </div>
+
+      {/* Local model library — coming-soon placeholder (hoisted to top per Gap 7) */}
+      <SettingsGroup
+        title={t(
+          "settings.postProcessing.modelsAndLocalProcessing.library.title",
+        )}
+      >
+        <div className="rounded-md border border-dashed border-mid-gray/40 bg-mid-gray/5 p-4 space-y-2">
+          <div className="flex items-center gap-2">
+            <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-logo-primary/10 text-logo-primary border border-logo-primary/40">
+              {t(
+                "settings.postProcessing.modelsAndLocalProcessing.library.comingSoonBadge",
+              )}
+            </span>
+          </div>
+          <p className="text-sm text-mid-gray">
+            {t(
+              "settings.postProcessing.modelsAndLocalProcessing.library.comingSoonBody",
+            )}
+          </p>
+          <p className="text-xs text-mid-gray/80">
+            {t(
+              "settings.postProcessing.modelsAndLocalProcessing.library.currentBridge",
+            )}
+          </p>
+        </div>
+      </SettingsGroup>
+
+      {/* Hotkey */}
       <SettingsGroup title={t("settings.postProcessing.hotkey.title")}>
         <ShortcutInput
           shortcutId="transcribe_with_post_process"
@@ -436,10 +671,12 @@ export const PostProcessingSettings: React.FC = () => {
         />
       </SettingsGroup>
 
+      {/* API (includes selected model card + ProviderPicker with tabs) */}
       <SettingsGroup title={t("settings.postProcessing.api.title")}>
         <PostProcessingSettingsApi />
       </SettingsGroup>
 
+      {/* Prompts */}
       <SettingsGroup title={t("settings.postProcessing.prompts.title")}>
         <PostProcessingSettingsPrompts />
       </SettingsGroup>

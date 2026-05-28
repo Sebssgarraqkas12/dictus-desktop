@@ -107,7 +107,9 @@
       },
       "accessibility": {
         "title": "גישת נגישות",
-        "description": "נדרש כדי להקליד את הטקסט המתומלל לתוך האפליקציות שלך."
+        "description": "נדרש כדי להקליד את הטקסט המתומלל לתוך האפליקציות שלך.",
+        "restartHint": "macOS מצריך הפעלה מחדש של האפליקציה כדי לזהות שינויים בנגישות.",
+        "restart": "הפעל מחדש את Dictus"
       },
       "grant": "תן הרשאה",
       "granted": "ניתנה",
@@ -244,6 +246,7 @@
         "app": "אפליקציה",
         "output": "פלט",
         "transcription": "תמלול",
+        "postProcessing": "עיבוד בדיעבד",
         "history": "היסטוריה",
         "experimental": "ניסיוני"
       },
@@ -369,6 +372,26 @@
           "title": "ספק",
           "description": "בחר ספק שתואם ל-OpenAI."
         },
+        "providers": {
+          "sectionLocal": "במכשיר שלך",
+          "sectionExternal": "חיצוני — הנתונים יוצאים מהמכשיר הזה",
+          "labels": {
+            "custom": "Custom (מקומי)"
+          },
+          "descriptions": {
+            "apple_intelligence": "חינם • במכשיר • macOS Apple Silicon",
+            "custom": "Ollama / LM Studio ב-localhost"
+          }
+        },
+        "custom": {
+          "ollamaTip": "טיפ: התקן את <link>Ollama</link> והרץ <code>ollama serve</code> כדי להשתמש במודלים מקומיים.",
+          "testConnection": {
+            "button": "בדוק חיבור",
+            "success": "מחובר — {{count}} מודלים זמינים",
+            "errorTitle": "לא ניתן להגיע אל {{baseUrl}}",
+            "errorDetails": "פרטים"
+          }
+        },
         "appleIntelligence": {
           "title": "Apple Intelligence",
           "description": "רץ כולו על המכשיר. לא נדרש מפתח API או חיבור רשת.",
@@ -394,6 +417,36 @@
           "placeholderWithOptions": "חפש או בחר מודל",
           "placeholderNoOptions": "הקלד שם מודל",
           "refreshModels": "רענן מודלים"
+        }
+      },
+      "tabs": {
+        "local": "מקומי",
+        "cloud": "ענן"
+      },
+      "modelsAndLocalProcessing": {
+        "title": "מודלים ועיבוד מקומי",
+        "subtitle": "Dictus מעדיף מודלים מקומיים כדי להבטיח את הפרטיות שלך.",
+        "learnMore": "למידע נוסף",
+        "statusBadge": {
+          "ready_one": "{{count}} מודל מוכן",
+          "ready_other": "{{count}} מודלים מוכנים"
+        },
+        "selectedModel": {
+          "title": "מודל עיבוד לאחר תמלול",
+          "recommendedBadge": "מומלץ",
+          "tags": {
+            "local": "מקומי",
+            "private": "פרטי",
+            "noDataSent": "לא נשלחים נתונים",
+            "offlineCapable": "עובד ללא חיבור לאינטרנט"
+          },
+          "cloudSelectedNotice": "המודל שבחרת הוא ספק ענן. לחץ על הכרטיסייה \"ענן\" למטה כדי לראותו, או בחר במודל מקומי."
+        },
+        "library": {
+          "title": "ספריית מודלים מקומית",
+          "comingSoonBadge": "בקרוב",
+          "comingSoonBody": "הספרייה המקומית תגיע בשלב הבא: הורדה משולבת של מודלים GGUF (מומלץ: gemma3:4b), ניהול במצב לא מקוון, והרצה משובצת.",
+          "currentBridge": "בינתיים, השתמש ב-Custom (local) עם Ollama להרצת המודלים שלך מקומית."
         }
       },
       "prompts": {
@@ -507,6 +560,11 @@
       "recordingBuffer": {
         "title": "באפר הקלטה נוסף",
         "description": "זמן נוסף (במילישניות) להמשך הקלטה אחרי שחרור המקש, כדי ללכוד סוף דיבור. 0 = בלי באפר נוסף."
+      },
+      "simulateUpdaterRestart": {
+        "title": "Simulate Updater Restart",
+        "description": "Relaunches Dictus via the same API tauri-plugin-updater uses after applying an update. Use this to validate SHUT-03 (clean post-update relaunch) without publishing a throwaway test release.",
+        "button": "Simulate Restart"
       }
     },
     "about": {
@@ -533,6 +591,11 @@
         "title": "Privacy Policy",
         "description": "Your voice stays on your device. Read our privacy policy.",
         "button": "View Privacy Policy"
+      },
+      "networkSurface": {
+        "title": "משטח רשת",
+        "description": "כל נקודת קצה יוצאת שאפליקציה זו יכולה לפנות אליה, וכיצד להשבית כל אחת.",
+        "button": "הצג מסמך פרטיות"
       },
       "ecosystem": {
         "title": "Dictus Ecosystem",
