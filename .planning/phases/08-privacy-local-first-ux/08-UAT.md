@@ -1,19 +1,22 @@
 ---
-status: diagnosed
+status: passed
 phase: 08-privacy-local-first-ux
 source:
   - 08-01-SUMMARY.md
   - 08-02-SUMMARY.md
   - 08-03-SUMMARY.md
   - 08-04-SUMMARY.md
+  - 08-08-SUMMARY.md
+  - 08-09-SUMMARY.md
+  - 08-10-SUMMARY.md
 started: 2026-05-22T00:00:00Z
-updated: 2026-05-22T00:00:00Z
-diagnosis_note: |
-  Root cause is a design pivot rejected by user, not a code bug — skipped
-  parallel debug agents (no investigation needed). Closure split per user
-  decision (2026-05-22): UI-only items handled as a Phase 8 sub-phase
-  (gap-closure plan); embedded LLM runtime items deferred to a new
-  milestone "Local-First Models" promoted ahead of v1.3 Smart Modes.
+updated: 2026-05-28T00:00:00Z
+closure_note: |
+  All 6 gaps from the 2026-05-22 partial-pass UAT (3 bugs + 3 design pivots)
+  closed in source on feat/phase-08-local-first-ux via plans 08-08, 08-09,
+  08-10. Re-verification (08-VERIFICATION.md, 2026-05-22T21:00:00Z) reports
+  11/11 truths verified, 0 gaps remaining, 0 regressions. Closure commits
+  referenced in ## Closure section below.
 ---
 
 ## Current Test
@@ -181,3 +184,40 @@ skipped: 5
   entirely until the new milestone delivers it — decision deferred to
   the gap-closure planner.
   debug_session: ""
+
+## Closure
+
+All 6 gaps from the 2026-05-22 partial-pass UAT (test 9 issue + 5 skipped follow-ups) are closed in source on `feat/phase-08-local-first-ux` and verified by `08-VERIFICATION.md` (re-verification pass, 11/11 truths, 0 gaps remaining). The Phase 8 branch was merged into the Phase 9 branch on 2026-05-28 as part of AUDIT-03 closure.
+
+### Gap → closure plan → commit mapping
+
+| Gap | Description | Plan | Commit(s) |
+| --- | ----------- | ---- | --------- |
+| 1a  | Apple Intelligence unavailability Alert inline within `apple_intelligence` provider card | 08-08 | `47688cc` (renderRowExtras invoked for every row), `bbe82db` (Alert branched on `option.value === "apple_intelligence"`) |
+| 2a  | Ollama link visually identifiable as a link at rest (underline) | 08-08 | `bbe82db` (className `underline underline-offset-2 hover:opacity-80`) |
+| 2b  | API key field hidden when "Custom (local)" is the selected provider | 08-08 | `bbe82db` (`state.selectedProvider?.id !== "custom"` gate) |
+| 5   | Provider area uses Local / Cloud tabs (not the rejected cloud opt-in toggle) | 08-09 + 08-10 | `dd45f4f` (tabs control), `3433f9e` (tab-state wiring in parent), `4750bd2` (EN i18n), `54b9a85` (19 sibling locales) |
+| 6   | Three-pillar marketing block (Confidentialité / Contrôle / Expérience) removed from page | 08-09 + 08-10 | `3433f9e` (JSX delete), `4750bd2` (EN keys delete), `54b9a85` (locale propagation) |
+| 7   | Library coming-soon teaser hoisted to top of post-processing page | 08-09 | `3433f9e` (JSX reordered to first child after page header) |
+
+### All closure commits (full SHA list)
+
+- `47688cc` — `fix(08-08): make ProviderPicker invoke renderRowExtras for every row`
+- `bbe82db` — `fix(08-08): inline Apple Intelligence Alert, fix Ollama link visibility, hide API key for Custom (local)`
+- `dbf0a26` — `docs(08-08): complete post-processing UI gap-closure plan`
+- `dd45f4f` — `feat(08-09): replace cloud toggle with Local/Cloud tabs in ProviderPicker`
+- `3433f9e` — `refactor(08-09): hoist library to top, remove pillars, wire tab state in PostProcessingSettings`
+- `4750bd2` — `chore(08-09): update en/translation.json — add tabs.*, drop pillars.* + cloudToggle.*, update cloudSelectedNotice`
+- `cea7eb9` — `docs(08-09): complete local-cloud tabs restructure + library hoist + pillars removal`
+- `54b9a85` — `chore(08-10): propagate i18n key changes to 19 sibling locales`
+- `6d34e18` — `docs(08-10): complete sibling-locale i18n propagation plan`
+
+### Build / test posture (verified 2026-05-22, re-confirmed 2026-05-28 after Phase 8 merged into Phase 9)
+
+- `bun run check:translations` → "All 19 languages have complete translations!" (exit 0)
+- `bun run build` → built in 1.95s (exit 0)
+- `cargo test --manifest-path src-tauri/Cargo.toml --lib settings::tests` → 7/7 passed (exit 0)
+
+### Re-verification reference
+
+`.planning/phases/08-privacy-local-first-ux/08-VERIFICATION.md` (status: passed, score: 11/11, re_verification block documents all 6 gaps closed and 0 regressions).

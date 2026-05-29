@@ -1,33 +1,33 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.2
-milestone_name: Polish & Local-First UX
-status: verifying
-stopped_at: Completed 08-10-PLAN.md
-last_updated: "2026-05-22T20:33:12.565Z"
-last_activity: "2026-05-22 — 08-10 complete: i18n key changes propagated to all 19 sibling locales (tabs.local/.cloud translated and inserted between api and modelsAndLocalProcessing, cloudToggle and pillars blocks deleted, cloudSelectedNotice updated with locale-matching Cloud tab label); bun run check:translations exits 0 (19/19 pass)"
+milestone: null
+milestone_name: null
+status: between_milestones
+stopped_at: Completed v1.2 milestone archive
+last_updated: "2026-05-29T08:30:00.000Z"
+last_activity: "2026-05-29 — v1.2 Polish & Local-First UX shipped (4 phases / 16 plans / 18 requirements / audit passed); archived to .planning/milestones/v1.2-{ROADMAP,REQUIREMENTS,MILESTONE-AUDIT,INTEGRATION-CHECK}.md"
 progress:
-  total_phases: 3
-  completed_phases: 3
-  total_plans: 15
-  completed_plans: 15
-  percent: 100
+  total_phases: 0
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
+  percent: 0
 ---
 
 # Project State
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-04-15 at v1.2 kickoff)
+See: .planning/PROJECT.md (updated 2026-05-29 after v1.2 milestone completion)
 
-**Core value:** L'application doit être identifiable et utilisable comme Dictus Desktop — pas comme Handy — et rester vivante sans décrocher du upstream Handy.
-**Current focus:** v1.2 Phase 8 — Privacy / Local-First UX (next up, ready to discuss/plan)
+**Core value:** L'application doit être identifiable et utilisable comme Dictus Desktop — pas comme Handy — rester vivante sans décrocher du upstream Handy, et présenter le local-first comme défaut visible dans l'UX.
+**Current focus:** Between milestones — `/gsd:new-milestone` to draft v1.3 "Smart Mode & Translation" requirements + roadmap.
 
 ## Current Position
 
-Phase: 8 of 8 overall (Phase 3 of 3 in v1.2) — all plans executed, ready for re-UAT
-Plan: 08-10 complete (locale propagation across 19 sibling locales). Phase 8 source-side gap closure done.
-Status: Phase 8 complete in source — all 6 UAT gaps closed: bugs 1a/2a/2b via 08-08, design pivots 5/6/7 via 08-09 (en source) + 08-10 (19 sibling locales). `bun run check:translations` exits 0. Next: re-UAT via `/gsd:execute-phase 8` UAT checkpoint or direct `/gsd:verify-work 8`.
+Phase: none (v1.2 archived 2026-05-29)
+Plan: none
+Status: v1.2 shipped — all 18 requirements satisfied, all 4 phases passed verification, cross-phase integration + E2E flows verified, audit passed. Ready for v1.3 planning.
 Last activity: 2026-05-22 — 08-10 complete: i18n key changes propagated to all 19 sibling locales (tabs.local/.cloud translated and inserted between api and modelsAndLocalProcessing, cloudToggle and pillars blocks deleted, cloudSelectedNotice updated with locale-matching Cloud tab label); bun run check:translations exits 0 (19/19 pass)
 
 Progress: [██████████] 100% (v1.2 — Phase 8 source-side gap closure done; all 10 Phase 8 plans + UAT-checkpoint complete; re-UAT pending)
@@ -63,6 +63,7 @@ _Updated after each plan completion_
 | Phase 08-privacy-local-first-ux P08 | 2 min | 2 tasks | 2 files |
 | Phase 08-privacy-local-first-ux P09 | 3m 29s | 3 tasks | 3 files |
 | Phase 08-privacy-local-first-ux P10 | 1m 56s | 1 tasks | 19 files |
+| Phase 09-v1.2-audit-gap-closure P01 | 14min | 4 tasks | 17 files |
 
 ## Accumulated Context
 
@@ -106,6 +107,8 @@ _Updated after each plan completion_
 - [Phase 08-privacy-local-first-ux]: P09 — enable_cloud_providers Rust field kept vestigial (no schema migration); UI no longer reads/writes; settings tests still pass; cleanup deferrable to a dedicated migration plan
 - [Phase 08-privacy-local-first-ux]: P10 — All 19 sibling locales now mirror EN i18n: tabs.local/.cloud translated and inserted between api and modelsAndLocalProcessing; cloudToggle and pillars blocks deleted; cloudSelectedNotice updated per locale with brand-name Cloud matching each locale's tabs.cloud value. check:translations exits 0 (19/19 pass). Phase 8 source-side gap closure complete; ready for re-UAT.
 - [Phase 08-privacy-local-first-ux]: P10 — Locale propagation done via one-shot Node script (JSON.parse/stringify roundtrip) over 19 files; per-locale failure isolation log+continue; all 19 succeeded first try. Insertion-order-preserving key add (reconstruct parent key-by-key) keeps file diffs structurally identical to EN diff from 08-09.
+- [Phase 09-v1.2-audit-gap-closure]: Option A for llm_client.rs:137 (too_many_arguments): #[allow] suppression, TECH-04 deferred struct refactor — signature change risk exceeds v1.2 window
+- [Phase 09-v1.2-audit-gap-closure]: AUDIT-01/02/03 all closed: clippy clean, 07-VERIFICATION.md authored, 08-UAT.md promoted to status:passed
 
 ### Pending Todos
 
@@ -133,6 +136,6 @@ Carried from v1.1 audit:
 
 ## Session Continuity
 
-Last session: 2026-05-22T20:27:50.463Z
-Stopped at: Completed 08-10-PLAN.md
+Last session: 2026-05-28T22:01:55.865Z
+Stopped at: Completed 09-01-PLAN.md
 Resume file: None
