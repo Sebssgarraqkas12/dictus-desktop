@@ -379,7 +379,7 @@
             "custom": "Custom (local)"
           },
           "descriptions": {
-            "apple_intelligence": "Gratuit • sur l'appareil • macOS Apple Silicon",
+            "apple_intelligence": "Aucun téléchargement requis — macOS Apple Silicon",
             "custom": "Ollama / LM Studio sur localhost"
           }
         },
@@ -444,9 +444,41 @@
         },
         "library": {
           "title": "Bibliothèque de modèles locaux",
-          "comingSoonBadge": "Bientôt",
-          "comingSoonBody": "La bibliothèque locale arrive dans la prochaine étape : téléchargement intégré de modèles GGUF (recommandé : gemma3:4b), gestion hors ligne, et exécution embarquée.",
-          "currentBridge": "En attendant, utilisez Custom (local) avec Ollama pour exécuter vos modèles localement."
+          "description": "Téléchargez et gérez des modèles GGUF locaux. Les modèles s'exécutent entièrement sur votre appareil — aucune donnée ne quitte votre machine.",
+          "yourModels": "Vos modèles",
+          "availableModels": "Disponibles au téléchargement",
+          "recommendedBadge": "Recommandé",
+          "downloadModel": "Télécharger le modèle",
+          "activateModel": "Utiliser ce modèle",
+          "addCustomModel": "Ajouter un modèle personnalisé",
+          "dropZoneLabel": "Déposez un fichier .gguf ici",
+          "dropZoneSublabel": "ou utilisez le bouton ci-dessus",
+          "invalidGguf": "Fichier de modèle GGUF invalide. Veuillez sélectionner un fichier .gguf.",
+          "cancelDownload": "Annuler le téléchargement",
+          "models": {
+            "qwen25_1b5": {
+              "description": "Rapide et léger — fonctionne sur toutes les machines"
+            },
+            "gemma3_4b": {
+              "description": "Excellent pour la traduction — polyvalent et multilingue"
+            },
+            "phi4_mini": {
+              "description": "Suivi d'instructions précis — mise en forme et structure"
+            },
+            "llama32_3b": {
+              "description": "Généraliste équilibré — bon en français"
+            },
+            "translateGemma4b": {
+              "description": "Modèle de traduction dédié — 55 langues évaluées"
+            }
+          }
+        },
+        "embedded": {
+          "noModelHeading": "Aucun modèle local sélectionné",
+          "noModelBody": "Téléchargez un modèle ci-dessous pour activer le traitement intégré. Le modèle Qwen2.5-1.5B est recommandé pour la plupart des machines.",
+          "downloadNowLink": "Télécharger un modèle",
+          "providerLabel": "Intégré (local)",
+          "providerDescription": "S'exécute sur votre appareil. Nécessite un modèle local téléchargé."
         }
       },
       "prompts": {
@@ -562,9 +594,9 @@
         "description": "Temps supplémentaire (en millisecondes) pour continuer l'enregistrement après avoir relâché la touche, pour capturer l'audio restant. 0 = pas de tampon supplémentaire."
       },
       "simulateUpdaterRestart": {
-        "title": "Simulate Updater Restart",
-        "description": "Relaunches Dictus via the same API tauri-plugin-updater uses after applying an update. Use this to validate SHUT-03 (clean post-update relaunch) without publishing a throwaway test release.",
-        "button": "Simulate Restart"
+        "title": "Simuler un redémarrage de mise à jour",
+        "description": "Relance Dictus via la même API que tauri-plugin-updater utilise après l’application d’une mise à jour. Utilisez ceci pour valider SHUT-03 (redémarrage propre après mise à jour) sans publier une version de test temporaire.",
+        "button": "Simuler le redémarrage"
       }
     },
     "about": {
@@ -631,9 +663,9 @@
     "installing": "Installation...",
     "preparing": "Préparation...",
     "checkForUpdates": "Rechercher des mises à jour",
-    "portableUpdateTitle": "Manual update required",
-    "portableUpdateMessage": "Portable installs cannot be updated automatically. To update: download the latest NSIS installer from GitHub Releases, install it to the same folder, then copy your Data/ folder (settings, models, recordings) from the old version to the new one.",
-    "portableUpdateButton": "Open GitHub Releases"
+    "portableUpdateTitle": "Mise à jour manuelle requise",
+    "portableUpdateMessage": "Les installations portables ne peuvent pas être mises à jour automatiquement. Pour mettre à jour : téléchargez le dernier installateur NSIS depuis GitHub Releases, installez-le dans le même dossier, puis copiez votre dossier Data/ (paramètres, modèles, enregistrements) de l'ancienne version vers la nouvelle.",
+    "portableUpdateButton": "Ouvrir GitHub Releases"
   },
   "common": {
     "loading": "Chargement...",
@@ -678,7 +710,11 @@
     "modelLoadFailed": "Échec du chargement du modèle : {{model}}",
     "modelLoadFailedUnknown": "modèle inconnu",
     "pasteFailedTitle": "Échec du collage du texte",
-    "pasteFailed": "Le texte n'a pas pu être collé dans l'application active."
+    "pasteFailed": "Le texte n'a pas pu être collé dans l'application active.",
+    "boundary": {
+      "title": "Une erreur est survenue.",
+      "reload": "Recharger"
+    }
   },
   "appLanguage": {
     "title": "Langue de l'application",
@@ -687,5 +723,103 @@
   "overlay": {
     "transcribing": "Transcription...",
     "processing": "Traitement..."
+  },
+  "smartModes": {
+    "sections": {
+      "rewrite": "Réécriture",
+      "translation": "Traduction"
+    },
+    "createRewrite": "Nouvelle réécriture",
+    "createTranslation": "Nouvelle traduction",
+    "card": {
+      "saveCta": "Enregistrer le mode",
+      "discardCta": "Annuler les modifications",
+      "createCta": "Créer le mode",
+      "discardNewCta": "Annuler",
+      "addShortcut": "Ajouter un raccourci",
+      "shortcutConflict": "Déjà utilisé par : {{name}}",
+      "shortcutConflictBase": "Le début de ce raccourci ({{base}}) est déjà utilisé par {{name}} — il se déclenchera avant la prochaine touche",
+      "shortcutBaseHint": "Un raccourci dont le début correspond à un autre ne peut pas fonctionner — la première touche se déclenche avant que vous ayez terminé.",
+      "targetLanguage": "Langue cible",
+      "nameLabel": "Nom",
+      "promptLabel": "Invite",
+      "namePlaceholder": "Ex. Rendre concis",
+      "promptPlaceholder": "Réécrivez le texte suivant pour le rendre plus concis.\n\nTexte :\n${output}",
+      "outputHint": "Utilisez ${output} à l’endroit où la transcription doit être insérée."
+    },
+    "picker": {
+      "rewriteTitle": "Ajouter un mode de réécriture",
+      "translationTitle": "Ajouter un mode de traduction",
+      "custom": "Personnalisé",
+      "customSubtext": "Créez un mode avec votre propre nom et invite",
+      "added": "Ajouté",
+      "overwriteTitle": "Le mode existe déjà",
+      "overwriteConfirm": "« {{name}} » existe déjà. Le rajouter écrasera le mode existant. Continuer ?"
+    },
+    "shortcut": {
+      "clear": "Effacer",
+      "clearAriaLabel": "Effacer le raccourci {{combo}}",
+      "recording": "Appuyez sur les touches…"
+    },
+    "kind": {
+      "rewrite": "Réécriture",
+      "translation": "Traduction"
+    },
+    "translation": {
+      "enableHeading": "Activer la traduction hors ligne",
+      "enableBody": "La traduction s’effectue entièrement hors ligne via le LLM intégré. Choisissez un moteur pour commencer.",
+      "chooseCta": "Choisir le moteur de traduction",
+      "genericEngineNote": "Au mieux — la qualité varie selon le modèle",
+      "changeEngine": "Changer de moteur",
+      "currentEngine": "En cours d’utilisation : {{engine}}",
+      "engineGeneric": "Modèle actif",
+      "modal": {
+        "footnote": "Les deux options fonctionnent entièrement hors ligne. Vous pouvez modifier ce choix plus tard dans les paramètres.",
+        "applying": "Application…",
+        "applyFailed": "Impossible de changer le moteur de traduction.",
+        "activeBadge": "Actuellement utilisé",
+        "activeButton": "Actuellement utilisé",
+        "downloadingPercent": "Téléchargement… {{percent}}%",
+        "downloadBackgroundNote": "Vous pouvez fermer cette fenêtre — le téléchargement continue en arrière-plan.",
+        "verifying": "Vérification du téléchargement…",
+        "title": "Configurer la traduction hors ligne",
+        "recommendedHeading": "Recommandé : Gemma 3 4B",
+        "recommendedSubtext": "Un modèle 4B polyvalent avec une traduction fiable et précise dans de nombreuses langues et idiomes. ~2,5 Go à télécharger.",
+        "downloadRecommended": "Télécharger Gemma 3 4B",
+        "useRecommended": "Utiliser Gemma 3 4B",
+        "currentHeading": "Utiliser votre modèle actuel",
+        "currentSubtext": "Traduire avec {{model}} (votre modèle actif). La qualité varie selon le modèle.",
+        "currentNone": "Aucun modèle local n’est encore actif. Téléchargez-en un depuis la bibliothèque de modèles.",
+        "useCurrent": "Utiliser le modèle actuel",
+        "recommendOnlyHeading": "Gemma 3 4B recommandé pour la traduction",
+        "recommendOnlyBody": "Pour une meilleure qualité de traduction, sélectionnez Gemma 3 4B dans le sélecteur de modèle ci-dessus. La traduction s’effectue via votre unique modèle actif.",
+        "enableCta": "Activer la traduction hors ligne"
+      },
+      "recommendNote": "Gemma 3 4B est recommandé pour la traduction. Choisissez-le dans le sélecteur de modèle ci-dessus."
+    },
+    "delete": {
+      "title": "Supprimer le mode",
+      "confirm": "Supprimer « {{name}} » ? Le raccourci associé sera également supprimé.",
+      "ariaLabel": "Supprimer {{name}}"
+    },
+    "edit": {
+      "ariaLabel": "Modifier {{name}}"
+    },
+    "noModel": {
+      "heading": "Aucun modèle local sélectionné",
+      "body": "Sélectionnez ou téléchargez un modèle local ci-dessus pour utiliser les modes intelligents."
+    },
+    "defaultModes": {
+      "cleanUp": "Nettoyage",
+      "makeFormal": "Rendre formel",
+      "makeCasual": "Rendre informel",
+      "writeAsEmail": "Rédiger en e-mail",
+      "bulletPoints": "Points clés",
+      "summarize": "Résumer",
+      "translateToEnglish": "Traduire en anglais",
+      "translateToSpanish": "Traduire en espagnol",
+      "translateToFrench": "Traduire en français",
+      "translateToChinese": "Traduire en chinois"
+    }
   }
 }

@@ -298,9 +298,9 @@
         "title": "Phương thức dán",
         "description": "Chọn cách chèn văn bản. Trực tiếp: mô phỏng gõ phím qua đầu vào hệ thống. Không có: bỏ qua dán, chỉ cập nhật lịch sử/clipboard.",
         "options": {
-          "clipboard": "Clipboard ({{modifier}}+V)",
-          "clipboardCtrlShiftV": "Clipboard (Ctrl+Shift+V)",
-          "clipboardShiftInsert": "Clipboard (Shift+Insert)",
+          "clipboard": "Bộ nhớ tạm ({{modifier}}+V)",
+          "clipboardCtrlShiftV": "Bộ nhớ tạm (Ctrl+Shift+V)",
+          "clipboardShiftInsert": "Bộ nhớ tạm (Shift+Insert)",
           "direct": "Trực tiếp",
           "none": "Không có",
           "externalScript": "Script bên ngoài"
@@ -379,7 +379,7 @@
             "custom": "Custom (cục bộ)"
           },
           "descriptions": {
-            "apple_intelligence": "Miễn phí • trên thiết bị • macOS Apple Silicon",
+            "apple_intelligence": "Không cần tải xuống — macOS Apple Silicon",
             "custom": "Ollama / LM Studio trên localhost"
           }
         },
@@ -444,9 +444,41 @@
         },
         "library": {
           "title": "Thư viện mô hình cục bộ",
-          "comingSoonBadge": "Sắp ra mắt",
-          "comingSoonBody": "Thư viện cục bộ sẽ ra mắt ở bước tiếp theo: tải xuống mô hình GGUF tích hợp (khuyến nghị: gemma3:4b), quản lý ngoại tuyến và thực thi nhúng.",
-          "currentBridge": "Trong thời gian này, hãy sử dụng Custom (local) với Ollama để chạy mô hình của bạn cục bộ."
+          "description": "Tải xuống và quản lý các mô hình GGUF cục bộ. Mô hình chạy hoàn toàn trên thiết bị của bạn — không có dữ liệu nào rời khỏi máy tính.",
+          "yourModels": "Mô hình của tôi",
+          "availableModels": "Có sẵn để tải xuống",
+          "recommendedBadge": "Được khuyến nghị",
+          "downloadModel": "Tải mô hình",
+          "activateModel": "Dùng mô hình này",
+          "addCustomModel": "Thêm mô hình tùy chỉnh",
+          "dropZoneLabel": "Thả tệp .gguf vào đây",
+          "dropZoneSublabel": "hoặc dùng nút ở trên",
+          "invalidGguf": "Không phải tệp mô hình GGUF hợp lệ. Vui lòng chọn tệp .gguf.",
+          "cancelDownload": "Hủy tải xuống",
+          "models": {
+            "qwen25_1b5": {
+              "description": "Nhanh và nhẹ — chạy trên mọi máy"
+            },
+            "gemma3_4b": {
+              "description": "Xuất sắc cho dịch thuật — đa năng và đa ngôn ngữ"
+            },
+            "phi4_mini": {
+              "description": "Tuân theo hướng dẫn chính xác — định dạng và cấu trúc"
+            },
+            "llama32_3b": {
+              "description": "Tổng quát cân bằng — chất lượng đa ngôn ngữ vững chắc"
+            },
+            "translateGemma4b": {
+              "description": "Mô hình dịch thuật chuyên dụng — 55 ngôn ngữ được đánh giá"
+            }
+          }
+        },
+        "embedded": {
+          "noModelHeading": "Chưa chọn mô hình cục bộ",
+          "noModelBody": "Tải xuống mô hình bên dưới để bật xử lý tích hợp. Mô hình Qwen2.5-1.5B được khuyến nghị cho hầu hết các máy.",
+          "downloadNowLink": "Tải xuống mô hình",
+          "providerLabel": "Tích hợp (cục bộ)",
+          "providerDescription": "Chạy trên thiết bị của bạn. Cần có mô hình cục bộ đã tải xuống."
         }
       },
       "prompts": {
@@ -562,9 +594,9 @@
         "description": "Thời gian thêm (tính bằng mili giây) để tiếp tục ghi âm sau khi nhả phím, để thu âm thanh cuối. 0 = không có bộ đệm thêm."
       },
       "simulateUpdaterRestart": {
-        "title": "Simulate Updater Restart",
-        "description": "Relaunches Dictus via the same API tauri-plugin-updater uses after applying an update. Use this to validate SHUT-03 (clean post-update relaunch) without publishing a throwaway test release.",
-        "button": "Simulate Restart"
+        "title": "Mô phỏng khởi động lại bản cập nhật",
+        "description": "Khởi động lại Dictus thông qua cùng API mà tauri-plugin-updater sử dụng sau khi áp dụng bản cập nhật. Sử dụng để xác thực SHUT-03 (khởi động lại sạch sau cập nhật) mà không cần phát hành phiên bản thử nghiệm tạm thời.",
+        "button": "Mô phỏng khởi động lại"
       }
     },
     "about": {
@@ -588,9 +620,9 @@
         "button": "Quyên góp"
       },
       "privacy": {
-        "title": "Privacy Policy",
-        "description": "Your voice stays on your device. Read our privacy policy.",
-        "button": "View Privacy Policy"
+        "title": "Chính sách bảo mật",
+        "description": "Giọng nói của bạn ở lại trên thiết bị của bạn. Đọc chính sách bảo mật của chúng tôi.",
+        "button": "Xem chính sách bảo mật"
       },
       "networkSurface": {
         "title": "Bề mặt mạng",
@@ -598,17 +630,17 @@
         "button": "Xem tài liệu bảo mật"
       },
       "ecosystem": {
-        "title": "Dictus Ecosystem",
-        "description": "Dictus is available on iOS, Android, and Desktop.",
-        "button": "Learn More"
+        "title": "Hệ sinh thái Dictus",
+        "description": "Dictus có sẵn trên iOS, Android và Desktop.",
+        "button": "Tìm hiểu thêm"
       },
       "acknowledgments": {
         "title": "Lời cảm ơn",
         "handy": {
           "title": "Handy",
-          "description": "Open-source desktop speech-to-text application by CJ Pais",
-          "details": "Dictus Desktop is a fork of Handy. Thanks to CJ Pais and the Handy community for building the foundation that Dictus is built upon.",
-          "button": "View on GitHub"
+          "description": "Ứng dụng máy tính để bàn mã nguồn mở chuyển giọng nói thành văn bản của CJ Pais",
+          "details": "Dictus Desktop là bản fork của Handy. Cảm ơn CJ Pais và cộng đồng Handy đã xây dựng nền tảng mà Dictus được xây dựng trên đó.",
+          "button": "Xem trên GitHub"
         },
         "whisper": {
           "title": "Whisper.cpp",
@@ -631,9 +663,9 @@
     "installing": "Đang cài đặt...",
     "preparing": "Đang chuẩn bị...",
     "checkForUpdates": "Kiểm tra cập nhật",
-    "portableUpdateTitle": "Manual update required",
-    "portableUpdateMessage": "Portable installs cannot be updated automatically. To update: download the latest NSIS installer from GitHub Releases, install it to the same folder, then copy your Data/ folder (settings, models, recordings) from the old version to the new one.",
-    "portableUpdateButton": "Open GitHub Releases"
+    "portableUpdateTitle": "Cần cập nhật thủ công",
+    "portableUpdateMessage": "Bản cài đặt di động không thể cập nhật tự động. Để cập nhật: tải xuống trình cài đặt NSIS mới nhất từ GitHub Releases, cài đặt vào cùng thư mục, sau đó sao chép thư mục Data/ (cài đặt, mô hình, bản ghi âm) từ phiên bản cũ sang phiên bản mới.",
+    "portableUpdateButton": "Mở GitHub Releases"
   },
   "common": {
     "loading": "Đang tải...",
@@ -678,7 +710,11 @@
     "modelLoadFailed": "Không thể tải mô hình: {{model}}",
     "modelLoadFailedUnknown": "mô hình không xác định",
     "pasteFailedTitle": "Không thể dán văn bản",
-    "pasteFailed": "Không thể dán văn bản vào ứng dụng đang hoạt động."
+    "pasteFailed": "Không thể dán văn bản vào ứng dụng đang hoạt động.",
+    "boundary": {
+      "title": "Đã xảy ra lỗi.",
+      "reload": "Tải lại"
+    }
   },
   "appLanguage": {
     "title": "Ngôn ngữ ứng dụng",
@@ -687,5 +723,103 @@
   "overlay": {
     "transcribing": "Đang chuyển đổi...",
     "processing": "Đang xử lý..."
+  },
+  "smartModes": {
+    "sections": {
+      "rewrite": "Viết lại",
+      "translation": "Dịch thuật"
+    },
+    "createRewrite": "Viết lại mới",
+    "createTranslation": "Dịch thuật mới",
+    "card": {
+      "saveCta": "Lưu chế độ",
+      "discardCta": "Hủy thay đổi",
+      "createCta": "Tạo chế độ",
+      "discardNewCta": "Hủy",
+      "addShortcut": "Thêm phím tắt",
+      "shortcutConflict": "Đã được sử dụng bởi: {{name}}",
+      "shortcutConflictBase": "Phần đầu của phím tắt này ({{base}}) đã được {{name}} sử dụng — sẽ kích hoạt trước phím tiếp theo",
+      "shortcutBaseHint": "Phím tắt có phần đầu trùng với phím tắt khác sẽ không hoạt động — phím đầu tiên kích hoạt trước khi bạn hoàn thành.",
+      "targetLanguage": "Ngôn ngữ đích",
+      "nameLabel": "Tên",
+      "promptLabel": "Hướng dẫn",
+      "namePlaceholder": "vd. Làm ngắn gọn",
+      "promptPlaceholder": "Viết lại đoạn văn sau để ngắn gọn hơn.\n\nVăn bản:\n${output}",
+      "outputHint": "Sử dụng ${output} tại vị trí cần chèn bản ghi âm."
+    },
+    "picker": {
+      "rewriteTitle": "Thêm chế độ viết lại",
+      "translationTitle": "Thêm chế độ dịch thuật",
+      "custom": "Tùy chỉnh",
+      "customSubtext": "Tạo chế độ với tên và hướng dẫn riêng của bạn",
+      "added": "Đã thêm",
+      "overwriteTitle": "Chế độ đã tồn tại",
+      "overwriteConfirm": "«{{name}}» đã tồn tại. Thêm lại sẽ ghi đè chế độ hiện có. Tiếp tục?"
+    },
+    "shortcut": {
+      "clear": "Xóa",
+      "clearAriaLabel": "Xóa phím tắt {{combo}}",
+      "recording": "Nhấn các phím…"
+    },
+    "kind": {
+      "rewrite": "Viết lại",
+      "translation": "Dịch thuật"
+    },
+    "translation": {
+      "enableHeading": "Bật dịch thuật ngoại tuyến",
+      "enableBody": "Dịch thuật chạy hoàn toàn ngoại tuyến qua mô hình ngôn ngữ tích hợp. Chọn một công cụ để bắt đầu.",
+      "chooseCta": "Chọn công cụ dịch thuật",
+      "genericEngineNote": "Cố gắng tốt nhất — chất lượng thay đổi tùy theo mô hình",
+      "changeEngine": "Đổi công cụ",
+      "currentEngine": "Đang dùng: {{engine}}",
+      "engineGeneric": "Mô hình đang hoạt động",
+      "modal": {
+        "footnote": "Cả hai tùy chọn đều chạy hoàn toàn ngoại tuyến. Bạn có thể thay đổi lựa chọn này sau trong cài đặt.",
+        "applying": "Đang áp dụng…",
+        "applyFailed": "Không thể thay đổi công cụ dịch thuật.",
+        "activeBadge": "Đang được dùng",
+        "activeButton": "Đang được dùng",
+        "downloadingPercent": "Đang tải… {{percent}}%",
+        "downloadBackgroundNote": "Bạn có thể đóng cửa sổ này — quá trình tải xuống tiếp tục ở nền.",
+        "verifying": "Đang xác minh tải xuống…",
+        "title": "Thiết lập dịch thuật ngoại tuyến",
+        "recommendedHeading": "Khuyến nghị: Gemma 3 4B",
+        "recommendedSubtext": "Mô hình 4B đa năng với khả năng dịch thuật đáng tin cậy trong nhiều ngôn ngữ. ~2,5 GB tải xuống.",
+        "downloadRecommended": "Tải Gemma 3 4B",
+        "useRecommended": "Dùng Gemma 3 4B",
+        "currentHeading": "Dùng mô hình hiện tại",
+        "currentSubtext": "Dịch với {{model}} (mô hình đang hoạt động). Chất lượng thay đổi tùy theo mô hình.",
+        "currentNone": "Chưa có mô hình cục bộ nào đang hoạt động. Tải xuống một mô hình từ thư viện mô hình trước.",
+        "useCurrent": "Dùng mô hình hiện tại",
+        "recommendOnlyHeading": "Gemma 3 4B được khuyến nghị cho dịch thuật",
+        "recommendOnlyBody": "Để có chất lượng dịch thuật tốt nhất, chọn Gemma 3 4B trong bộ chọn mô hình ở trên. Dịch thuật chạy qua mô hình đang hoạt động duy nhất của bạn.",
+        "enableCta": "Bật dịch thuật ngoại tuyến"
+      },
+      "recommendNote": "Gemma 3 4B được khuyến nghị cho dịch thuật. Chọn nó trong bộ chọn mô hình ở trên."
+    },
+    "delete": {
+      "title": "Xóa chế độ",
+      "confirm": "Xóa «{{name}}»? Phím tắt liên kết cũng sẽ bị xóa.",
+      "ariaLabel": "Xóa {{name}}"
+    },
+    "edit": {
+      "ariaLabel": "Chỉnh sửa {{name}}"
+    },
+    "noModel": {
+      "heading": "Chưa chọn mô hình cục bộ",
+      "body": "Chọn hoặc tải xuống mô hình cục bộ ở trên để sử dụng Chế độ Thông minh."
+    },
+    "defaultModes": {
+      "cleanUp": "Dọn dẹp",
+      "makeFormal": "Chuyển trang trọng",
+      "makeCasual": "Chuyển thân mật",
+      "writeAsEmail": "Viết dưới dạng email",
+      "bulletPoints": "Gạch đầu dòng",
+      "summarize": "Tóm tắt",
+      "translateToEnglish": "Dịch sang tiếng Anh",
+      "translateToSpanish": "Dịch sang tiếng Tây Ban Nha",
+      "translateToFrench": "Dịch sang tiếng Pháp",
+      "translateToChinese": "Dịch sang tiếng Trung"
+    }
   }
 }

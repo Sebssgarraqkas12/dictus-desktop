@@ -31,7 +31,20 @@ serde = { version = "1", features = ["derive"] }
 
 [dependencies]
 once_cell = "1"
-tauri = { version = "2.10.2", features = [
+# Pure-Rust language detection. Used to steer post-processing output language:
+# small LLMs tend to answer in the language of the (English) instructions, so we
+# detect the input language and tell the model to respond in it.
+whatlang = "0.16"
+# Hard-pinned to EXACTLY 2.10.2: the [patch.crates-io] block below replaces
+# tauri-runtime/-wry/-utils with cjpais' `handy-2.10.2` fork (overlay
+# off-screen fix, cjpais/tauri@ad9ba9448b). That fork provides tauri-runtime
+# 2.10.0 / tauri-utils 2.8.2. tauri 2.10.2 requires `^2.10.0`/`^2.8.2`, so the
+# patch applies; tauri 2.10.3 bumped those requirements to `^2.10.1`/`^2.8.3`,
+# which the fork does NOT satisfy → cargo silently drops the patch and the
+# overlay fix is lost. A bare `~2.10`/`^2.10` lets `cargo update` float to
+# 2.10.3 and re-spring that trap, so we pin exactly. Bumping tauri must be a
+# deliberate manual edit (re-check the fork branch first). See issue #30.
+tauri = { version = "=2.10.2", features = [
   "protocol-asset",
   "macos-private-api",
   "tray-icon",
@@ -90,6 +103,7 @@ tauri-plugin-updater = "2.10.0"
 
 [target.'cfg(windows)'.dependencies]
 transcribe-rs = { version = "0.3.3", features = ["whisper-vulkan", "ort-directml"] }
+llama-cpp-2 = { version = "0.1.146", features = ["vulkan"] }
 windows = { version = "0.61.3", features = [
   "Win32_Media_Audio_Endpoints",
   "Win32_System_Com_StructuredStorage",
@@ -102,11 +116,13 @@ winreg = "0.55"
 [target.'cfg(target_os = "macos")'.dependencies]
 tauri-nspanel = { git = "https://github.com/ahkohd/tauri-nspanel", branch = "v2.1" }
 transcribe-rs = { version = "0.3.3", features = ["whisper-metal"] }
+llama-cpp-2 = { version = "0.1.146", features = ["metal"] }
 
 [target.'cfg(target_os = "linux")'.dependencies]
 gtk-layer-shell = { version = "0.8", features = ["v0_6"] }
 gtk = "0.18"
 transcribe-rs = { version = "0.3.3", features = ["whisper-vulkan"] }
+llama-cpp-2 = { version = "0.1.146", features = ["vulkan"] }
 
 [patch.crates-io]
 tauri-runtime = { git = "https://github.com/cjpais/tauri.git", branch = "handy-2.10.2" }

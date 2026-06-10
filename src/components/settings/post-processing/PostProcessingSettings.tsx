@@ -1,18 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { Trans, useTranslation } from "react-i18next";
 import { RefreshCcw } from "lucide-react";
-import { commands } from "@/bindings";
 
 import { Alert } from "../../ui/Alert";
-import {
-  Dropdown,
-  SettingContainer,
-  SettingsGroup,
-  Textarea,
-} from "@/components/ui";
+import { SettingContainer, SettingsGroup } from "@/components/ui";
 import { Button } from "../../ui/Button";
 import { ResetButton } from "../../ui/ResetButton";
-import { Input } from "../../ui/Input";
 
 import { ProviderPicker } from "../PostProcessingSettingsApi/ProviderPicker";
 import { TestConnectionButton } from "../PostProcessingSettingsApi/TestConnectionButton";
@@ -21,20 +14,116 @@ import { openUrl } from "@tauri-apps/plugin-opener";
 import { ApiKeyField } from "../PostProcessingSettingsApi/ApiKeyField";
 import { ModelSelect } from "../PostProcessingSettingsApi/ModelSelect";
 import { usePostProcessProviderState } from "../PostProcessingSettingsApi/usePostProcessProviderState";
-import { ShortcutInput } from "../ShortcutInput";
 import { useSettings } from "../../../hooks/useSettings";
+import { SmartModesSection } from "./SmartModesSection";
 import type { PostProcessProvider } from "@/bindings";
+import { LlmLibrarySection } from "./LlmLibrarySection";
+import type { ProviderEntry } from "./LlmLibrarySection";
+import { CustomGgufDropZone } from "./CustomGgufDropZone";
+import { useLlmModelStore } from "@/stores/llmModelStore";
 
-const LOCAL_PROVIDER_IDS_SET = new Set(["apple_intelligence", "custom"]);
+const LOCAL_PROVIDER_IDS_SET = new Set([
+  "apple_intelligence",
+  "custom",
+  "embedded",
+]);
 const RECOMMENDED_PROVIDER_ID = "apple_intelligence";
 
 const PostProcessingSettingsApiComponent: React.FC = () => {
   const { t } = useTranslation();
   const state = usePostProcessProviderState();
+  const llmStore = useLlmModelStore();
+
+  // The embedded provider is no longer a standalone radio — the local GGUF
+  // models ARE the engine choices (see UI-SPEC R2). Selecting a downloaded
+  // model sets provider=embedded + active model in one action.
+  const isEmbeddedSelected = state.selectedProviderId === "embedded";
+  const handleSelectEmbeddedModel = async (modelId: string) => {
+    await llmStore.setActiveModel(modelId);
+    await state.handleProviderSelect("embedded");
+  };
+
+  // Name of the active local model, used to label the "active engine" summary
+  // when embedded is selected (e.g. "Qwen2.5 1.5B" instead of a generic label).
+  const activeLlmName =
+    llmStore.models.find((m) => m.id === llmStore.activeModelId)?.name ??
+    t(
+      "settings.postProcessing.modelsAndLocalProcessing.embedded.providerLabel",
+    );
+
+  // Non-model on-device engines (Apple Intelligence, Ollama/Custom) interleaved
+  // with the GGUF model cards. Apple leads (top), Custom trails (bottom) so it
+  // stays anchored next to its config block; the active engine is shown by its
+  // "Actif" badge, not by reordering.
+  const providerEntries: ProviderEntry[] =
+    state.groupedProviderOptions.local.map((opt) => ({
+      id: opt.value,
+      label: opt.label,
+      description: opt.description,
+      checked: state.selectedProviderId === opt.value,
+      position: opt.value === "custom" ? "trail" : "lead",
+      onSelect: (id: string) => void state.handleProviderSelect(id),
+      extras:
+        opt.value === "apple_intelligence" ? (
+          state.appleIntelligenceUnavailable ? (
+            <Alert variant="error" contained>
+              {t("settings.postProcessing.api.appleIntelligence.unavailable")}
+            </Alert>
+          ) : undefined
+        ) : opt.value === "custom" ? (
+          <p className="text-xs text-mid-gray/80">
+            <Trans
+              i18nKey="settings.postProcessing.api.custom.ollamaTip"
+              components={{
+                link: (
+                  <a
+                    role="link"
+                    tabIndex={0}
+                    className="text-logo-primary underline underline-offset-2 hover:opacity-80 cursor-pointer"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      void openUrl("https://ollama.com");
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        void openUrl("https://ollama.com");
+                      }
+                    }}
+                  />
+                ),
+                code: (
+                  <code className="font-mono text-xs bg-mid-gray/10 px-1 rounded" />
+                ),
+              }}
+            />
+          </p>
+        ) : undefined,
+    }));
+
+  // Full on-device tab body: provider cards + model cards in stable order,
+  // import zone last.
+  const localContent = (
+    <LlmLibrarySection
+      engineMode
+      embeddedSelected={isEmbeddedSelected}
+      onSelectAsEngine={(id) => void handleSelectEmbeddedModel(id)}
+      providerEntries={providerEntries}
+      footer={<CustomGgufDropZone />}
+    />
+  );
 
   const selectedIsCloud =
     state.selectedProviderId !== "" &&
     !LOCAL_PROVIDER_IDS_SET.has(state.selectedProviderId);
+
+  // Embedded is an in-process provider with no external config (no API key,
+  // base URL, or model dropdown) — same as Apple Intelligence. Because
+  // "embedded" is synthetic, state.selectedProvider falls back to providers[0],
+  // so gate these sections on the id directly rather than the resolved object.
+  const isEmbedded = isEmbeddedSelected;
 
   const initialTab: "local" | "cloud" =
     state.selectedProviderId !== "" &&
@@ -95,7 +184,9 @@ const PostProcessingSettingsApiComponent: React.FC = () => {
                 "settings.postProcessing.modelsAndLocalProcessing.selectedModel.title",
               )}
             </h3>
-            {state.selectedProvider ? (
+            {isEmbedded ? (
+              <p className="text-base font-medium mt-1">{activeLlmName}</p>
+            ) : state.selectedProvider ? (
               <p className="text-base font-medium mt-1">
                 {state.selectedProvider.label}
               </p>
@@ -143,71 +234,26 @@ const PostProcessingSettingsApiComponent: React.FC = () => {
         grouped={true}
       >
         <ProviderPicker
-          localOptions={state.groupedProviderOptions.local}
           externalOptions={state.groupedProviderOptions.external}
           value={state.selectedProviderId}
           onChange={state.handleProviderSelect}
           activeTab={activeTab}
           onTabChange={handleTabChange}
-          renderRowExtras={(option) => {
-            if (option.value === "apple_intelligence") {
-              if (!state.appleIntelligenceUnavailable) return null;
-              return (
-                <Alert variant="error" contained>
-                  {t(
-                    "settings.postProcessing.api.appleIntelligence.unavailable",
-                  )}
-                </Alert>
-              );
-            }
-            if (option.value !== "custom") return null;
-            return (
-              <div className="space-y-2 mt-2">
-                <p className="text-xs text-mid-gray/80">
-                  <Trans
-                    i18nKey="settings.postProcessing.api.custom.ollamaTip"
-                    components={{
-                      link: (
-                        <a
-                          role="link"
-                          tabIndex={0}
-                          className="text-logo-primary underline underline-offset-2 hover:opacity-80 cursor-pointer"
-                          onClick={(e) => {
-                            e.preventDefault();
-                            void openUrl("https://ollama.com");
-                          }}
-                          onKeyDown={(e) => {
-                            if (e.key === "Enter" || e.key === " ") {
-                              e.preventDefault();
-                              void openUrl("https://ollama.com");
-                            }
-                          }}
-                        />
-                      ),
-                      code: (
-                        <code className="font-mono text-xs bg-mid-gray/10 px-1 rounded" />
-                      ),
-                    }}
-                  />
-                </p>
-                <TestConnectionButton baseUrl={state.baseUrl} />
-              </div>
-            );
-          }}
+          localContent={localContent}
         />
       </SettingContainer>
 
-      {!state.isAppleProvider && (
+      {!state.isAppleProvider && !isEmbedded && (
         <>
           {state.selectedProvider?.id === "custom" && (
             <SettingContainer
               title={t("settings.postProcessing.api.baseUrl.title")}
               description={t("settings.postProcessing.api.baseUrl.description")}
               descriptionMode="tooltip"
-              layout="horizontal"
+              layout="stacked"
               grouped={true}
             >
-              <div className="flex items-center gap-2">
+              <div className="flex flex-col items-start gap-2">
                 <BaseUrlField
                   value={state.baseUrl}
                   onBlur={state.handleBaseUrlChange}
@@ -215,8 +261,9 @@ const PostProcessingSettingsApiComponent: React.FC = () => {
                     "settings.postProcessing.api.baseUrl.placeholder",
                   )}
                   disabled={state.isBaseUrlUpdating}
-                  className="min-w-[380px]"
+                  className="w-full"
                 />
+                <TestConnectionButton baseUrl={state.baseUrl} />
               </div>
             </SettingContainer>
           )}
@@ -245,7 +292,7 @@ const PostProcessingSettingsApiComponent: React.FC = () => {
         </>
       )}
 
-      {!state.isAppleProvider && (
+      {!state.isAppleProvider && !isEmbedded && (
         <SettingContainer
           title={t("settings.postProcessing.api.model.title")}
           description={
@@ -292,285 +339,10 @@ const PostProcessingSettingsApiComponent: React.FC = () => {
   );
 };
 
-const PostProcessingSettingsPromptsComponent: React.FC = () => {
-  const { t } = useTranslation();
-  const { getSetting, updateSetting, isUpdating, refreshSettings } =
-    useSettings();
-  const [isCreating, setIsCreating] = useState(false);
-  const [draftName, setDraftName] = useState("");
-  const [draftText, setDraftText] = useState("");
-
-  const prompts = getSetting("post_process_prompts") || [];
-  const selectedPromptId = getSetting("post_process_selected_prompt_id") || "";
-  const selectedPrompt =
-    prompts.find((prompt) => prompt.id === selectedPromptId) || null;
-
-  useEffect(() => {
-    if (isCreating) return;
-
-    if (selectedPrompt) {
-      setDraftName(selectedPrompt.name);
-      setDraftText(selectedPrompt.prompt);
-    } else {
-      setDraftName("");
-      setDraftText("");
-    }
-  }, [
-    isCreating,
-    selectedPromptId,
-    selectedPrompt?.name,
-    selectedPrompt?.prompt,
-  ]);
-
-  const handlePromptSelect = (promptId: string | null) => {
-    if (!promptId) return;
-    updateSetting("post_process_selected_prompt_id", promptId);
-    setIsCreating(false);
-  };
-
-  const handleCreatePrompt = async () => {
-    if (!draftName.trim() || !draftText.trim()) return;
-
-    try {
-      const result = await commands.addPostProcessPrompt(
-        draftName.trim(),
-        draftText.trim(),
-      );
-      if (result.status === "ok") {
-        await refreshSettings();
-        updateSetting("post_process_selected_prompt_id", result.data.id);
-        setIsCreating(false);
-      }
-    } catch (error) {
-      console.error("Failed to create prompt:", error);
-    }
-  };
-
-  const handleUpdatePrompt = async () => {
-    if (!selectedPromptId || !draftName.trim() || !draftText.trim()) return;
-
-    try {
-      await commands.updatePostProcessPrompt(
-        selectedPromptId,
-        draftName.trim(),
-        draftText.trim(),
-      );
-      await refreshSettings();
-    } catch (error) {
-      console.error("Failed to update prompt:", error);
-    }
-  };
-
-  const handleDeletePrompt = async (promptId: string) => {
-    if (!promptId) return;
-
-    try {
-      await commands.deletePostProcessPrompt(promptId);
-      await refreshSettings();
-      setIsCreating(false);
-    } catch (error) {
-      console.error("Failed to delete prompt:", error);
-    }
-  };
-
-  const handleCancelCreate = () => {
-    setIsCreating(false);
-    if (selectedPrompt) {
-      setDraftName(selectedPrompt.name);
-      setDraftText(selectedPrompt.prompt);
-    } else {
-      setDraftName("");
-      setDraftText("");
-    }
-  };
-
-  const handleStartCreate = () => {
-    setIsCreating(true);
-    setDraftName("");
-    setDraftText("");
-  };
-
-  const hasPrompts = prompts.length > 0;
-  const isDirty =
-    !!selectedPrompt &&
-    (draftName.trim() !== selectedPrompt.name ||
-      draftText.trim() !== selectedPrompt.prompt.trim());
-
-  return (
-    <SettingContainer
-      title={t("settings.postProcessing.prompts.selectedPrompt.title")}
-      description={t(
-        "settings.postProcessing.prompts.selectedPrompt.description",
-      )}
-      descriptionMode="tooltip"
-      layout="stacked"
-      grouped={true}
-    >
-      <div className="space-y-3">
-        <div className="flex gap-2">
-          <Dropdown
-            selectedValue={selectedPromptId || null}
-            options={prompts.map((p) => ({
-              value: p.id,
-              label: p.name,
-            }))}
-            onSelect={(value) => handlePromptSelect(value)}
-            placeholder={
-              prompts.length === 0
-                ? t("settings.postProcessing.prompts.noPrompts")
-                : t("settings.postProcessing.prompts.selectPrompt")
-            }
-            disabled={
-              isUpdating("post_process_selected_prompt_id") || isCreating
-            }
-            className="flex-1"
-          />
-          <Button
-            onClick={handleStartCreate}
-            variant="primary"
-            size="md"
-            disabled={isCreating}
-          >
-            {t("settings.postProcessing.prompts.createNew")}
-          </Button>
-        </div>
-
-        {!isCreating && hasPrompts && selectedPrompt && (
-          <div className="space-y-3">
-            <div className="space-y-2 flex flex-col">
-              <label className="text-sm font-semibold">
-                {t("settings.postProcessing.prompts.promptLabel")}
-              </label>
-              <Input
-                type="text"
-                value={draftName}
-                onChange={(e) => setDraftName(e.target.value)}
-                placeholder={t(
-                  "settings.postProcessing.prompts.promptLabelPlaceholder",
-                )}
-                variant="compact"
-              />
-            </div>
-
-            <div className="space-y-2 flex flex-col">
-              <label className="text-sm font-semibold">
-                {t("settings.postProcessing.prompts.promptInstructions")}
-              </label>
-              <Textarea
-                value={draftText}
-                onChange={(e) => setDraftText(e.target.value)}
-                placeholder={t(
-                  "settings.postProcessing.prompts.promptInstructionsPlaceholder",
-                )}
-              />
-              <p className="text-xs text-mid-gray/70">
-                <Trans
-                  i18nKey="settings.postProcessing.prompts.promptTip"
-                  components={{ code: <code /> }}
-                />
-              </p>
-            </div>
-
-            <div className="flex gap-2 pt-2">
-              <Button
-                onClick={handleUpdatePrompt}
-                variant="primary"
-                size="md"
-                disabled={!draftName.trim() || !draftText.trim() || !isDirty}
-              >
-                {t("settings.postProcessing.prompts.updatePrompt")}
-              </Button>
-              <Button
-                onClick={() => handleDeletePrompt(selectedPromptId)}
-                variant="secondary"
-                size="md"
-                disabled={!selectedPromptId || prompts.length <= 1}
-              >
-                {t("settings.postProcessing.prompts.deletePrompt")}
-              </Button>
-            </div>
-          </div>
-        )}
-
-        {!isCreating && !selectedPrompt && (
-          <div className="p-3 bg-mid-gray/5 rounded-md border border-mid-gray/20">
-            <p className="text-sm text-mid-gray">
-              {hasPrompts
-                ? t("settings.postProcessing.prompts.selectToEdit")
-                : t("settings.postProcessing.prompts.createFirst")}
-            </p>
-          </div>
-        )}
-
-        {isCreating && (
-          <div className="space-y-3">
-            <div className="space-y-2 block flex flex-col">
-              <label className="text-sm font-semibold text-text">
-                {t("settings.postProcessing.prompts.promptLabel")}
-              </label>
-              <Input
-                type="text"
-                value={draftName}
-                onChange={(e) => setDraftName(e.target.value)}
-                placeholder={t(
-                  "settings.postProcessing.prompts.promptLabelPlaceholder",
-                )}
-                variant="compact"
-              />
-            </div>
-
-            <div className="space-y-2 flex flex-col">
-              <label className="text-sm font-semibold">
-                {t("settings.postProcessing.prompts.promptInstructions")}
-              </label>
-              <Textarea
-                value={draftText}
-                onChange={(e) => setDraftText(e.target.value)}
-                placeholder={t(
-                  "settings.postProcessing.prompts.promptInstructionsPlaceholder",
-                )}
-              />
-              <p className="text-xs text-mid-gray/70">
-                <Trans
-                  i18nKey="settings.postProcessing.prompts.promptTip"
-                  components={{ code: <code /> }}
-                />
-              </p>
-            </div>
-
-            <div className="flex gap-2 pt-2">
-              <Button
-                onClick={handleCreatePrompt}
-                variant="primary"
-                size="md"
-                disabled={!draftName.trim() || !draftText.trim()}
-              >
-                {t("settings.postProcessing.prompts.createPrompt")}
-              </Button>
-              <Button
-                onClick={handleCancelCreate}
-                variant="secondary"
-                size="md"
-              >
-                {t("settings.postProcessing.prompts.cancel")}
-              </Button>
-            </div>
-          </div>
-        )}
-      </div>
-    </SettingContainer>
-  );
-};
-
 export const PostProcessingSettingsApi = React.memo(
   PostProcessingSettingsApiComponent,
 );
 PostProcessingSettingsApi.displayName = "PostProcessingSettingsApi";
-
-export const PostProcessingSettingsPrompts = React.memo(
-  PostProcessingSettingsPromptsComponent,
-);
-PostProcessingSettingsPrompts.displayName = "PostProcessingSettingsPrompts";
 
 export const PostProcessingSettings: React.FC = () => {
   const { t } = useTranslation();
@@ -635,51 +407,13 @@ export const PostProcessingSettings: React.FC = () => {
         </span>
       </div>
 
-      {/* Local model library — coming-soon placeholder (hoisted to top per Gap 7) */}
-      <SettingsGroup
-        title={t(
-          "settings.postProcessing.modelsAndLocalProcessing.library.title",
-        )}
-      >
-        <div className="rounded-md border border-dashed border-mid-gray/40 bg-mid-gray/5 p-4 space-y-2">
-          <div className="flex items-center gap-2">
-            <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-logo-primary/10 text-logo-primary border border-logo-primary/40">
-              {t(
-                "settings.postProcessing.modelsAndLocalProcessing.library.comingSoonBadge",
-              )}
-            </span>
-          </div>
-          <p className="text-sm text-mid-gray">
-            {t(
-              "settings.postProcessing.modelsAndLocalProcessing.library.comingSoonBody",
-            )}
-          </p>
-          <p className="text-xs text-mid-gray/80">
-            {t(
-              "settings.postProcessing.modelsAndLocalProcessing.library.currentBridge",
-            )}
-          </p>
-        </div>
-      </SettingsGroup>
-
-      {/* Hotkey */}
-      <SettingsGroup title={t("settings.postProcessing.hotkey.title")}>
-        <ShortcutInput
-          shortcutId="transcribe_with_post_process"
-          descriptionMode="tooltip"
-          grouped={true}
-        />
-      </SettingsGroup>
-
       {/* API (includes selected model card + ProviderPicker with tabs) */}
       <SettingsGroup title={t("settings.postProcessing.api.title")}>
         <PostProcessingSettingsApi />
       </SettingsGroup>
 
-      {/* Prompts */}
-      <SettingsGroup title={t("settings.postProcessing.prompts.title")}>
-        <PostProcessingSettingsPrompts />
-      </SettingsGroup>
+      {/* Smart Modes */}
+      <SmartModesSection />
     </div>
   );
 };

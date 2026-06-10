@@ -379,7 +379,7 @@
             "custom": "Custom (local)"
           },
           "descriptions": {
-            "apple_intelligence": "Grátis • no dispositivo • macOS Apple Silicon",
+            "apple_intelligence": "Sem download necessário — macOS Apple Silicon",
             "custom": "Ollama / LM Studio em localhost"
           }
         },
@@ -444,9 +444,41 @@
         },
         "library": {
           "title": "Biblioteca de modelos locais",
-          "comingSoonBadge": "Em breve",
-          "comingSoonBody": "A biblioteca local chega no próximo passo: download integrado de modelos GGUF (recomendado: gemma3:4b), gerenciamento offline e execução incorporada.",
-          "currentBridge": "Enquanto isso, use Custom (local) com Ollama para executar seus modelos localmente."
+          "description": "Baixe e gerencie modelos GGUF locais. Os modelos são executados inteiramente no seu dispositivo — nenhum dado sai da sua máquina.",
+          "yourModels": "Seus modelos",
+          "availableModels": "Disponíveis para download",
+          "recommendedBadge": "Recomendado",
+          "downloadModel": "Baixar modelo",
+          "activateModel": "Usar este modelo",
+          "addCustomModel": "Adicionar modelo personalizado",
+          "dropZoneLabel": "Solte um arquivo .gguf aqui",
+          "dropZoneSublabel": "ou use o botão acima",
+          "invalidGguf": "Não é um arquivo de modelo GGUF válido. Por favor, selecione um arquivo .gguf.",
+          "cancelDownload": "Cancelar download",
+          "models": {
+            "qwen25_1b5": {
+              "description": "Rápido e leve — funciona em qualquer máquina"
+            },
+            "gemma3_4b": {
+              "description": "Excelente para tradução — versátil e multilíngue"
+            },
+            "phi4_mini": {
+              "description": "Seguimento preciso de instruções — formatação e estrutura"
+            },
+            "llama32_3b": {
+              "description": "Generalista equilibrado — boa qualidade multilíngue"
+            },
+            "translateGemma4b": {
+              "description": "Modelo de tradução dedicado — 55 idiomas avaliados"
+            }
+          }
+        },
+        "embedded": {
+          "noModelHeading": "Nenhum modelo local selecionado",
+          "noModelBody": "Baixe um modelo abaixo para habilitar o processamento integrado. O modelo Qwen2.5-1.5B é recomendado para a maioria das máquinas.",
+          "downloadNowLink": "Baixar um modelo",
+          "providerLabel": "Integrado (local)",
+          "providerDescription": "Funciona no seu dispositivo. Requer um modelo local baixado."
         }
       },
       "prompts": {
@@ -562,9 +594,9 @@
         "description": "Tempo extra (em milissegundos) para continuar gravando após soltar a tecla, para capturar áudio restante. 0 = sem buffer extra."
       },
       "simulateUpdaterRestart": {
-        "title": "Simulate Updater Restart",
-        "description": "Relaunches Dictus via the same API tauri-plugin-updater uses after applying an update. Use this to validate SHUT-03 (clean post-update relaunch) without publishing a throwaway test release.",
-        "button": "Simulate Restart"
+        "title": "Simular reinicialização do atualizador",
+        "description": "Reinicia o Dictus através da mesma API que o tauri-plugin-updater usa após aplicar uma atualização. Use isso para validar SHUT-03 (reinicialização limpa após atualização) sem publicar uma versão de teste descartável.",
+        "button": "Simular reinicialização"
       }
     },
     "about": {
@@ -588,9 +620,9 @@
         "button": "Doar"
       },
       "privacy": {
-        "title": "Privacy Policy",
-        "description": "Your voice stays on your device. Read our privacy policy.",
-        "button": "View Privacy Policy"
+        "title": "Política de privacidade",
+        "description": "Sua voz permanece no seu dispositivo. Leia nossa política de privacidade.",
+        "button": "Ver política de privacidade"
       },
       "networkSurface": {
         "title": "Superfície de rede",
@@ -598,17 +630,17 @@
         "button": "Ver doc de privacidade"
       },
       "ecosystem": {
-        "title": "Dictus Ecosystem",
-        "description": "Dictus is available on iOS, Android, and Desktop.",
-        "button": "Learn More"
+        "title": "Ecossistema Dictus",
+        "description": "O Dictus está disponível no iOS, Android e Desktop.",
+        "button": "Saiba mais"
       },
       "acknowledgments": {
         "title": "Agradecimentos",
         "handy": {
           "title": "Handy",
-          "description": "Open-source desktop speech-to-text application by CJ Pais",
-          "details": "Dictus Desktop is a fork of Handy. Thanks to CJ Pais and the Handy community for building the foundation that Dictus is built upon.",
-          "button": "View on GitHub"
+          "description": "Aplicação de desktop de código aberto de voz para texto por CJ Pais",
+          "details": "Dictus Desktop é um fork do Handy. Obrigado a CJ Pais e à comunidade Handy por construir a base sobre a qual o Dictus foi construído.",
+          "button": "Ver no GitHub"
         },
         "whisper": {
           "title": "Whisper.cpp",
@@ -631,9 +663,9 @@
     "installing": "Instalando...",
     "preparing": "Preparando...",
     "checkForUpdates": "Verificar atualizações",
-    "portableUpdateTitle": "Manual update required",
-    "portableUpdateMessage": "Portable installs cannot be updated automatically. To update: download the latest NSIS installer from GitHub Releases, install it to the same folder, then copy your Data/ folder (settings, models, recordings) from the old version to the new one.",
-    "portableUpdateButton": "Open GitHub Releases"
+    "portableUpdateTitle": "Atualização manual necessária",
+    "portableUpdateMessage": "Instalações portáteis não podem ser atualizadas automaticamente. Para atualizar: baixe o instalador NSIS mais recente do GitHub Releases, instale-o na mesma pasta e, em seguida, copie sua pasta Data/ (configurações, modelos, gravações) da versão antiga para a nova.",
+    "portableUpdateButton": "Abrir GitHub Releases"
   },
   "common": {
     "loading": "Carregando...",
@@ -678,7 +710,11 @@
     "modelLoadFailed": "Falha ao carregar o modelo: {{model}}",
     "modelLoadFailedUnknown": "modelo desconhecido",
     "pasteFailedTitle": "Falha ao colar o texto",
-    "pasteFailed": "Não foi possível colar o texto no aplicativo ativo."
+    "pasteFailed": "Não foi possível colar o texto no aplicativo ativo.",
+    "boundary": {
+      "title": "Algo deu errado.",
+      "reload": "Recarregar"
+    }
   },
   "appLanguage": {
     "title": "Idioma da Aplicação",
@@ -687,5 +723,103 @@
   "overlay": {
     "transcribing": "Transcrevendo...",
     "processing": "Processando..."
+  },
+  "smartModes": {
+    "sections": {
+      "rewrite": "Reescrita",
+      "translation": "Tradução"
+    },
+    "createRewrite": "Nova reescrita",
+    "createTranslation": "Nova tradução",
+    "card": {
+      "saveCta": "Salvar modo",
+      "discardCta": "Descartar alterações",
+      "createCta": "Criar modo",
+      "discardNewCta": "Descartar",
+      "addShortcut": "Adicionar atalho",
+      "shortcutConflict": "Já usado por: {{name}}",
+      "shortcutConflictBase": "O início deste atalho ({{base}}) já é usado por {{name}} — ele dispararia antes da próxima tecla",
+      "shortcutBaseHint": "Um atalho cujo início corresponde a outro não pode funcionar — a primeira tecla dispara antes de você terminar.",
+      "targetLanguage": "Idioma de destino",
+      "nameLabel": "Nome",
+      "promptLabel": "Instrução",
+      "namePlaceholder": "ex. Tornar conciso",
+      "promptPlaceholder": "Reescreva o texto a seguir para torná-lo mais conciso.\n\nTexto:\n${output}",
+      "outputHint": "Use ${output} onde a transcrição ditada deve ser inserida."
+    },
+    "picker": {
+      "rewriteTitle": "Adicionar modo de reescrita",
+      "translationTitle": "Adicionar modo de tradução",
+      "custom": "Personalizado",
+      "customSubtext": "Crie um modo com seu próprio nome e instrução",
+      "added": "Adicionado",
+      "overwriteTitle": "Modo já existe",
+      "overwriteConfirm": "«{{name}}» já existe. Adicioná-lo novamente substituirá o modo existente. Continuar?"
+    },
+    "shortcut": {
+      "clear": "Limpar",
+      "clearAriaLabel": "Limpar atalho {{combo}}",
+      "recording": "Pressione as teclas…"
+    },
+    "kind": {
+      "rewrite": "Reescrita",
+      "translation": "Tradução"
+    },
+    "translation": {
+      "enableHeading": "Ativar tradução offline",
+      "enableBody": "A tradução é executada completamente offline através do LLM integrado. Escolha um mecanismo para começar.",
+      "chooseCta": "Escolher mecanismo de tradução",
+      "genericEngineNote": "Melhor esforço — a qualidade varia de acordo com o modelo",
+      "changeEngine": "Alterar mecanismo",
+      "currentEngine": "Em uso: {{engine}}",
+      "engineGeneric": "Modelo ativo",
+      "modal": {
+        "footnote": "Ambas as opções funcionam completamente offline. Você pode alterar essa escolha mais tarde nas configurações.",
+        "applying": "Aplicando…",
+        "applyFailed": "Não foi possível alterar o mecanismo de tradução.",
+        "activeBadge": "Atualmente em uso",
+        "activeButton": "Atualmente em uso",
+        "downloadingPercent": "Baixando… {{percent}}%",
+        "downloadBackgroundNote": "Você pode fechar esta janela — o download continua em segundo plano.",
+        "verifying": "Verificando download…",
+        "title": "Configurar tradução offline",
+        "recommendedHeading": "Recomendado: Gemma 3 4B",
+        "recommendedSubtext": "Um modelo 4B versátil com tradução confiável em vários idiomas e expressões. ~2,5 GB de download.",
+        "downloadRecommended": "Baixar Gemma 3 4B",
+        "useRecommended": "Usar Gemma 3 4B",
+        "currentHeading": "Usar o modelo atual",
+        "currentSubtext": "Traduzir com {{model}} (seu modelo ativo). A qualidade varia de acordo com o modelo.",
+        "currentNone": "Nenhum modelo local está ativo ainda. Baixe um primeiro da biblioteca de modelos.",
+        "useCurrent": "Usar modelo atual",
+        "recommendOnlyHeading": "Gemma 3 4B recomendado para tradução",
+        "recommendOnlyBody": "Para a melhor qualidade de tradução, selecione Gemma 3 4B no seletor de modelos acima. A tradução é executada através do seu único modelo ativo.",
+        "enableCta": "Ativar tradução offline"
+      },
+      "recommendNote": "Gemma 3 4B é recomendado para tradução. Selecione-o no seletor de modelos acima."
+    },
+    "delete": {
+      "title": "Excluir modo",
+      "confirm": "Excluir «{{name}}»? O atalho associado também será removido.",
+      "ariaLabel": "Excluir {{name}}"
+    },
+    "edit": {
+      "ariaLabel": "Editar {{name}}"
+    },
+    "noModel": {
+      "heading": "Nenhum modelo local selecionado",
+      "body": "Selecione ou baixe um modelo local acima para usar os Modos Inteligentes."
+    },
+    "defaultModes": {
+      "cleanUp": "Limpar",
+      "makeFormal": "Tornar formal",
+      "makeCasual": "Tornar informal",
+      "writeAsEmail": "Escrever como e-mail",
+      "bulletPoints": "Tópicos",
+      "summarize": "Resumir",
+      "translateToEnglish": "Traduzir para inglês",
+      "translateToSpanish": "Traduzir para espanhol",
+      "translateToFrench": "Traduzir para francês",
+      "translateToChinese": "Traduzir para chinês"
+    }
   }
 }

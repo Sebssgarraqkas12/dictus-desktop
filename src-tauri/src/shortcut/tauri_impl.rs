@@ -23,10 +23,6 @@ pub fn init_shortcuts(app: &AppHandle) {
         if id == "cancel" {
             continue; // Skip cancel shortcut, it will be registered dynamically
         }
-        // Skip post-processing shortcut when the feature is disabled
-        if id == "transcribe_with_post_process" && !user_settings.post_process_enabled {
-            continue;
-        }
         let binding = user_settings
             .bindings
             .get(&id)
@@ -35,6 +31,23 @@ pub fn init_shortcuts(app: &AppHandle) {
 
         if let Err(e) = register_shortcut(app, binding) {
             error!("Failed to register shortcut {} during init: {}", id, e);
+        }
+    }
+
+    // Register smart mode shortcuts for any modes that have a non-empty binding.
+    // Default modes ship unbound, so this only fires for modes where the user has
+    // configured (or migrated) a key combo.
+    for mode in &user_settings.smart_modes {
+        let binding_key = format!("smart_mode_{}", mode.id);
+        if let Some(binding) = user_settings.bindings.get(&binding_key) {
+            if !binding.current_binding.trim().is_empty() {
+                if let Err(e) = register_shortcut(app, binding.clone()) {
+                    error!(
+                        "Failed to register smart mode shortcut {} during init: {}",
+                        binding_key, e
+                    );
+                }
+            }
         }
     }
 }

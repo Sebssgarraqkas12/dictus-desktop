@@ -3,6 +3,7 @@ use serde::de::{self, Visitor};
 use serde::{Deserialize, Deserializer, Serialize};
 use specta::Type;
 use std::collections::HashMap;
+use std::collections::HashSet;
 use std::fmt;
 use tauri::AppHandle;
 use tauri_plugin_store::StoreExt;
@@ -93,7 +94,40 @@ pub struct LLMPrompt {
     pub prompt: String,
 }
 
+#[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq, Type, Default)]
+#[serde(rename_all = "snake_case")]
+pub enum SmartModeKind {
+    #[default]
+    Rewrite,
+    Translation,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone, Default, Type, PartialEq)]
+#[serde(rename_all = "snake_case")]
+pub enum TranslationEngineChoice {
+    #[default]
+    NotChosen,
+    TranslateGemma,
+    GenericModel,
+}
+
 #[derive(Serialize, Deserialize, Debug, Clone, Type)]
+pub struct TargetLanguage {
+    pub code: String,
+    pub label: String,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone, Type)]
+pub struct SmartMode {
+    pub id: String,
+    pub name: String,
+    pub kind: SmartModeKind,
+    pub prompt: String,
+    #[serde(default)]
+    pub target_language: Option<TargetLanguage>,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone, Default, Type)]
 pub struct PostProcessProvider {
     pub id: String,
     pub label: String,
@@ -372,6 +406,14 @@ pub struct AppSettings {
     #[serde(default)]
     pub post_process_selected_prompt_id: Option<String>,
     #[serde(default)]
+    pub settings_schema_version: u32,
+    #[serde(default = "default_smart_modes")]
+    pub smart_modes: Vec<SmartMode>,
+    #[serde(default)]
+    pub smart_mode_active_id: Option<String>,
+    #[serde(default)]
+    pub translation_engine_choice: TranslationEngineChoice,
+    #[serde(default)]
     pub mute_while_recording: bool,
     #[serde(default)]
     pub append_trailing_space: bool,
@@ -402,6 +444,10 @@ pub struct AppSettings {
     pub whisper_gpu_device: i32,
     #[serde(default)]
     pub extra_recording_buffer_ms: u64,
+    #[serde(default)]
+    pub active_llm_model_id: Option<String>,
+    #[serde(default)]
+    pub llm_unload_timeout: ModelUnloadTimeout,
 }
 
 fn default_model() -> String {
@@ -619,6 +665,106 @@ fn default_post_process_prompts() -> Vec<LLMPrompt> {
     }]
 }
 
+pub const CLEAN_UP_MODE_ID: &str = "mode_clean_up";
+
+/// Returns the full predefined template catalogue (10 modes).
+/// This is the source for the create-picker; it is NOT the first-run seed.
+pub fn smart_mode_templates() -> Vec<SmartMode> {
+    vec![
+        SmartMode {
+            id: "mode_clean_up".to_string(),
+            name: "Clean Up".to_string(),
+            kind: SmartModeKind::Rewrite,
+            prompt: "Clean this transcript:\n1. Fix spelling, capitalization, and punctuation errors\n2. ALWAYS write numbers and quantities as digits, never spelled out. Convert every single one: vingt-cinq mille euros → 25 000 €, dix pour cent → 10 %, quatorze heures → 14 h, trois → 3, twenty-five → 25, ten percent → 10%\n3. Replace spoken punctuation with symbols (point/period → ., virgule/comma → ,, point d'interrogation/question mark → ?)\n4. Remove filler words (euh, um, uh, like as filler)\n5. Keep the language in the original version (if it was french, keep it in french for example)\n6. Never output two punctuation marks in a row (for example \".,\" or \",.\")\n\nPreserve exact meaning and word order. Do not paraphrase or reorder content.\n\nReturn only the cleaned transcript.\n\nTranscript:\n${output}".to_string(),
+            target_language: None,
+        },
+        SmartMode {
+            id: "mode_make_formal".to_string(),
+            name: "Make Formal".to_string(),
+            kind: SmartModeKind::Rewrite,
+            prompt: "Rewrite this text in a formal, professional tone while preserving its exact meaning and language. Return only the rewritten text.\n\nText:\n${output}".to_string(),
+            target_language: None,
+        },
+        SmartMode {
+            id: "mode_make_casual".to_string(),
+            name: "Make Casual".to_string(),
+            kind: SmartModeKind::Rewrite,
+            prompt: "Rewrite this text in a relaxed, casual, conversational tone while preserving its exact meaning and language. Return only the rewritten text.\n\nText:\n${output}".to_string(),
+            target_language: None,
+        },
+        SmartMode {
+            id: "mode_email".to_string(),
+            name: "Write as Email".to_string(),
+            kind: SmartModeKind::Rewrite,
+            prompt: "Reformat this text as an email WITHOUT changing its tone, register, or wording more than necessary. Keep exactly the same level of familiarity or formality as the input: if it is casual and friendly, the email stays casual and friendly; if it is formal (vouvoiement), it stays formal. Apply ONLY email structure:\n- Start with exactly ONE greeting line, then a blank line. Use the same greeting word the user actually spoke and do not change it: if the text starts with \"salut\", the greeting must start with \"Salut\"; if it starts with \"bonjour\", it must start with \"Bonjour\". Add the recipient's name and fix capitalization. If the input has no greeting at all, use \"Bonjour,\". Never write a second greeting.\n- Then the message body, fixing capitalization and punctuation and splitting the run-on dictation into proper sentences (add periods and question marks where needed). Keep the user's own words and phrasing; do NOT make requests more polite and do NOT add words the user did not say (for example, never add \"s'il te plaît\" or \"please\").\n- Closing: ONLY if the input ends with a closing phrase (such as \"cordialement\", \"bien cordialement\", \"à plus\", \"bien à vous\", \"merci\") followed by a name, you MUST move it OUT of the body into a separate signature block: end the body sentence, then a blank line, then the closing word on its own line, then the name on the next line. Example — input body \"...votre email ? Bien cordialement, Pierre.\" must become:\n...votre email ?\n\nBien cordialement,\nPierre\nIf the input contains no such closing, do NOT add one.\nDo NOT add a subject line. Do NOT invent pleasantries such as \"I hope you are well\". Do not add, remove, or reword the actual content. Preserve the meaning and language. Return only the email.\n\nText:\n${output}".to_string(),
+            target_language: None,
+        },
+        SmartMode {
+            id: "mode_bullet_points".to_string(),
+            name: "Bullet Points".to_string(),
+            kind: SmartModeKind::Rewrite,
+            prompt: "Restructure this text as a concise bulleted list, one idea per bullet, preserving meaning and language. Use a hyphen \"- \" as the bullet marker for every item. Return only the bullet list.\n\nText:\n${output}".to_string(),
+            target_language: None,
+        },
+        SmartMode {
+            id: "mode_summarize".to_string(),
+            name: "Summarize".to_string(),
+            kind: SmartModeKind::Rewrite,
+            prompt: "Summarize this text concisely, preserving the key points and language. Return only the summary.\n\nText:\n${output}".to_string(),
+            target_language: None,
+        },
+        SmartMode {
+            id: "mode_translate_en".to_string(),
+            name: "Translate \u{2192} English".to_string(),
+            kind: SmartModeKind::Translation,
+            prompt: String::new(),
+            target_language: Some(TargetLanguage {
+                code: "en".to_string(),
+                label: "English".to_string(),
+            }),
+        },
+        SmartMode {
+            id: "mode_translate_es".to_string(),
+            name: "Translate \u{2192} Spanish".to_string(),
+            kind: SmartModeKind::Translation,
+            prompt: String::new(),
+            target_language: Some(TargetLanguage {
+                code: "es".to_string(),
+                label: "Spanish".to_string(),
+            }),
+        },
+        SmartMode {
+            id: "mode_translate_fr".to_string(),
+            name: "Translate \u{2192} French".to_string(),
+            kind: SmartModeKind::Translation,
+            prompt: String::new(),
+            target_language: Some(TargetLanguage {
+                code: "fr".to_string(),
+                label: "French".to_string(),
+            }),
+        },
+        SmartMode {
+            id: "mode_translate_zh".to_string(),
+            name: "Translate \u{2192} Chinese".to_string(),
+            kind: SmartModeKind::Translation,
+            prompt: String::new(),
+            target_language: Some(TargetLanguage {
+                code: "zh".to_string(),
+                label: "Chinese".to_string(),
+            }),
+        },
+    ]
+}
+
+/// Returns the first-run seed: only Clean Up.
+/// The full catalogue is available via `smart_mode_templates()`.
+fn default_smart_modes() -> Vec<SmartMode> {
+    smart_mode_templates()
+        .into_iter()
+        .filter(|m| m.id == CLEAN_UP_MODE_ID)
+        .collect()
+}
+
 fn default_whisper_gpu_device() -> i32 {
     -1 // auto
 }
@@ -682,6 +828,123 @@ fn ensure_post_process_defaults(settings: &mut AppSettings) -> bool {
     changed
 }
 
+fn migrate_settings_if_needed(settings: &mut AppSettings) -> bool {
+    const CURRENT_VERSION: u32 = 1;
+    if settings.settings_schema_version >= CURRENT_VERSION {
+        return false;
+    }
+
+    // Build new modes list atomically — do not mutate settings.smart_modes until we are done
+    let mut new_modes: Vec<SmartMode> = default_smart_modes();
+    let seeded_ids: HashSet<String> = new_modes.iter().map(|m| m.id.clone()).collect();
+
+    const PRISTINE_IMPROVE_ID: &str = "default_improve_transcriptions";
+    let pristine_prompt = default_post_process_prompts()
+        .into_iter()
+        .next()
+        .map(|p| p.prompt)
+        .unwrap_or_default();
+
+    for p in &settings.post_process_prompts {
+        if seeded_ids.contains(&p.id) {
+            // Already seeded — skip to avoid duplicates
+            continue;
+        }
+        if p.id == PRISTINE_IMPROVE_ID && p.prompt == pristine_prompt {
+            // Unmodified "Improve Transcriptions" — replaced by Clean Up; drop it
+            continue;
+        }
+        // Custom prompt or edited Improve Transcriptions — preserve as Rewrite mode
+        new_modes.push(SmartMode {
+            id: p.id.clone(),
+            name: p.name.clone(),
+            kind: SmartModeKind::Rewrite,
+            prompt: p.prompt.clone(),
+            target_language: None,
+        });
+    }
+
+    // Determine active id
+    let new_active_id: Option<String> = match &settings.post_process_selected_prompt_id {
+        Some(sel) if sel == PRISTINE_IMPROVE_ID => {
+            // Check if it was pristine (replaced by Clean Up) or edited (kept with same id)
+            let was_pristine = settings
+                .post_process_prompts
+                .iter()
+                .find(|p| &p.id == sel)
+                .map(|p| p.prompt == pristine_prompt)
+                .unwrap_or(true); // if not found, treat as pristine → Clean Up
+            if was_pristine {
+                Some(CLEAN_UP_MODE_ID.to_string())
+            } else {
+                // Edited version kept with original id
+                Some(sel.clone())
+            }
+        }
+        Some(sel) => {
+            // Check if this id exists in the migrated modes
+            if new_modes.iter().any(|m| &m.id == sel) {
+                Some(sel.clone())
+            } else {
+                Some(CLEAN_UP_MODE_ID.to_string())
+            }
+        }
+        None => Some(CLEAN_UP_MODE_ID.to_string()),
+    };
+
+    // Combo transfer: move transcribe_with_post_process binding to smart_mode_{active_id}
+    if let Some(ref active_id) = new_active_id {
+        if let Some(old_binding) = settings.bindings.remove("transcribe_with_post_process") {
+            if !old_binding.current_binding.is_empty() {
+                let active_name = new_modes
+                    .iter()
+                    .find(|m| &m.id == active_id)
+                    .map(|m| m.name.clone())
+                    .unwrap_or_else(|| "Smart Mode".to_string());
+                let key = format!("smart_mode_{}", active_id);
+                settings.bindings.insert(
+                    key.clone(),
+                    ShortcutBinding {
+                        id: key,
+                        name: active_name,
+                        description: "Smart Mode shortcut".to_string(),
+                        default_binding: old_binding.current_binding.clone(),
+                        current_binding: old_binding.current_binding,
+                    },
+                );
+            }
+        }
+    }
+
+    // Atomic commit
+    settings.smart_modes = new_modes;
+    settings.smart_mode_active_id = new_active_id;
+    settings.settings_schema_version = CURRENT_VERSION;
+
+    true
+}
+
+/// Remove any `bindings["smart_mode_*"]` whose mode id is not present in
+/// `smart_modes`. This prevents orphaned smart-mode shortcuts (e.g. from a
+/// reduced seed or a deleted mode that crashed before cleanup) from registering
+/// and firing invisibly after the next launch.
+///
+/// Returns `true` if any binding was removed (settings mutated).
+/// Called from `load_or_create_app_settings` AFTER `migrate_settings_if_needed`
+/// so it also catches seed-reduction orphans introduced by intermediary builds.
+pub fn reconcile_dangling_smart_mode_bindings(settings: &mut AppSettings) -> bool {
+    let live_ids: std::collections::HashSet<String> =
+        settings.smart_modes.iter().map(|m| m.id.clone()).collect();
+    let before = settings.bindings.len();
+    settings.bindings.retain(|key, _| {
+        match key.strip_prefix("smart_mode_") {
+            Some(mode_id) => live_ids.contains(mode_id),
+            None => true, // not a smart-mode binding — keep
+        }
+    });
+    settings.bindings.len() != before
+}
+
 pub const SETTINGS_STORE_PATH: &str = "settings_store.json";
 
 pub fn get_default_settings() -> AppSettings {
@@ -703,26 +966,6 @@ pub fn get_default_settings() -> AppSettings {
             description: "Converts your speech into text.".to_string(),
             default_binding: default_shortcut.to_string(),
             current_binding: default_shortcut.to_string(),
-        },
-    );
-    #[cfg(target_os = "windows")]
-    let default_post_process_shortcut = "ctrl+shift+space";
-    #[cfg(target_os = "macos")]
-    let default_post_process_shortcut = "option+shift+space";
-    #[cfg(target_os = "linux")]
-    let default_post_process_shortcut = "ctrl+shift+space";
-    #[cfg(not(any(target_os = "windows", target_os = "macos", target_os = "linux")))]
-    let default_post_process_shortcut = "alt+shift+space";
-
-    bindings.insert(
-        "transcribe_with_post_process".to_string(),
-        ShortcutBinding {
-            id: "transcribe_with_post_process".to_string(),
-            name: "Transcribe with Post-Processing".to_string(),
-            description: "Converts your speech into text and applies AI post-processing."
-                .to_string(),
-            default_binding: default_post_process_shortcut.to_string(),
-            current_binding: default_post_process_shortcut.to_string(),
         },
     );
     bindings.insert(
@@ -771,6 +1014,10 @@ pub fn get_default_settings() -> AppSettings {
         post_process_models: default_post_process_models(),
         post_process_prompts: default_post_process_prompts(),
         post_process_selected_prompt_id: None,
+        settings_schema_version: 1,
+        smart_modes: default_smart_modes(),
+        smart_mode_active_id: default_smart_modes().first().map(|m| m.id.clone()),
+        translation_engine_choice: TranslationEngineChoice::NotChosen,
         mute_while_recording: false,
         append_trailing_space: false,
         app_language: default_app_language(),
@@ -787,6 +1034,8 @@ pub fn get_default_settings() -> AppSettings {
         ort_accelerator: OrtAcceleratorSetting::default(),
         whisper_gpu_device: default_whisper_gpu_device(),
         extra_recording_buffer_ms: 0,
+        active_llm_model_id: None,
+        llm_unload_timeout: ModelUnloadTimeout::default(),
     }
 }
 
@@ -863,6 +1112,15 @@ pub fn load_or_create_app_settings(app: &AppHandle) -> AppSettings {
         store.set("settings", serde_json::to_value(&settings).unwrap());
     }
 
+    let migrated = migrate_settings_if_needed(&mut settings);
+    // Run reconciliation after migration so seed-reduction orphans and any
+    // binding left by a pre-cleanup build are removed before init_shortcuts
+    // iterates bindings. If either step mutated settings, persist once.
+    let reconciled = reconcile_dangling_smart_mode_bindings(&mut settings);
+    if migrated || reconciled {
+        store.set("settings", serde_json::to_value(&settings).unwrap());
+    }
+
     settings
 }
 
@@ -884,6 +1142,10 @@ pub fn get_settings(app: &AppHandle) -> AppSettings {
     };
 
     if ensure_post_process_defaults(&mut settings) {
+        store.set("settings", serde_json::to_value(&settings).unwrap());
+    }
+
+    if migrate_settings_if_needed(&mut settings) {
         store.set("settings", serde_json::to_value(&settings).unwrap());
     }
 
@@ -993,5 +1255,445 @@ mod tests {
     fn default_settings_have_cloud_providers_disabled() {
         let settings = get_default_settings();
         assert!(!settings.enable_cloud_providers);
+    }
+
+    // ── Smart Modes defaults tests ────────────────────────────────────────────
+
+    #[test]
+    fn smart_mode_templates_count_is_ten() {
+        assert_eq!(smart_mode_templates().len(), 10);
+    }
+
+    #[test]
+    fn default_smart_modes_seeds_only_clean_up() {
+        let modes = default_smart_modes();
+        assert_eq!(modes.len(), 1, "first-run seed must be exactly 1 mode");
+        assert_eq!(
+            modes[0].id, CLEAN_UP_MODE_ID,
+            "first-run seed must be Clean Up"
+        );
+    }
+
+    #[test]
+    fn default_smart_modes_order() {
+        let modes = smart_mode_templates();
+        assert_eq!(modes[0].name, "Clean Up");
+        for (i, mode) in modes.iter().enumerate().take(6) {
+            assert_eq!(
+                mode.kind,
+                SmartModeKind::Rewrite,
+                "index {} should be Rewrite",
+                i
+            );
+        }
+        for (i, mode) in modes.iter().enumerate().skip(6) {
+            assert_eq!(
+                mode.kind,
+                SmartModeKind::Translation,
+                "index {} should be Translation",
+                i
+            );
+        }
+    }
+
+    #[test]
+    fn default_translation_modes_have_target_language() {
+        let modes = smart_mode_templates();
+        let expected_codes = ["en", "es", "fr", "zh"];
+        for (i, code) in expected_codes.iter().enumerate() {
+            let mode = &modes[6 + i];
+            assert_eq!(mode.kind, SmartModeKind::Translation);
+            let tl = mode
+                .target_language
+                .as_ref()
+                .expect("translation mode must have target_language");
+            assert_eq!(&tl.code, code, "index {} code mismatch", 6 + i);
+            assert!(!tl.label.is_empty(), "index {} label is empty", 6 + i);
+        }
+    }
+
+    #[test]
+    fn smart_mode_kind_serializes_snake_case() {
+        let rewrite = serde_json::to_string(&SmartModeKind::Rewrite).unwrap();
+        let translation = serde_json::to_string(&SmartModeKind::Translation).unwrap();
+        assert_eq!(rewrite, "\"rewrite\"");
+        assert_eq!(translation, "\"translation\"");
+    }
+
+    #[test]
+    fn v12_settings_deserializes_without_smart_modes_fields() {
+        // A minimal v1.2-shaped JSON lacking the new fields should deserialize without error.
+        let v12_json = serde_json::json!({
+            "bindings": {},
+            "push_to_talk": true,
+            "audio_feedback": false,
+            "selected_model": "",
+            "always_on_microphone": false,
+            "translate_to_english": false,
+            "selected_language": "auto",
+            "overlay_position": "none",
+            "debug_mode": false,
+            "log_level": "info",
+            "post_process_enabled": false,
+            "post_process_provider_id": "custom",
+            "post_process_providers": [],
+            "post_process_api_keys": {},
+            "post_process_models": {},
+            "post_process_prompts": [],
+            "external_script_path": null
+        });
+        let settings: AppSettings = serde_json::from_value(v12_json).unwrap();
+        assert_eq!(settings.settings_schema_version, 0);
+        assert!(settings.smart_mode_active_id.is_none());
+        // smart_modes gets the default via serde default — now only Clean Up
+        assert_eq!(settings.smart_modes.len(), 1);
+    }
+
+    // ── Migration tests ───────────────────────────────────────────────────────
+
+    fn make_v12_fixture(
+        prompt_id: &str,
+        prompt_name: &str,
+        prompt_text: &str,
+        selected_id: Option<&str>,
+        post_process_combo: &str,
+    ) -> AppSettings {
+        let v12_json = serde_json::json!({
+            "bindings": {
+                "transcribe": {
+                    "id": "transcribe",
+                    "name": "Transcribe",
+                    "description": "Converts your speech into text.",
+                    "default_binding": "option+space",
+                    "current_binding": "option+space"
+                },
+                "transcribe_with_post_process": {
+                    "id": "transcribe_with_post_process",
+                    "name": "Transcribe with Post-Processing",
+                    "description": "Converts your speech into text and applies AI post-processing.",
+                    "default_binding": post_process_combo,
+                    "current_binding": post_process_combo
+                },
+                "cancel": {
+                    "id": "cancel",
+                    "name": "Cancel",
+                    "description": "Cancels the current recording.",
+                    "default_binding": "escape",
+                    "current_binding": "escape"
+                }
+            },
+            "push_to_talk": true,
+            "audio_feedback": false,
+            "selected_model": "",
+            "always_on_microphone": false,
+            "translate_to_english": false,
+            "selected_language": "auto",
+            "overlay_position": "none",
+            "debug_mode": false,
+            "log_level": "info",
+            "post_process_enabled": true,
+            "post_process_provider_id": "custom",
+            "post_process_providers": [],
+            "post_process_api_keys": {},
+            "post_process_models": {},
+            "post_process_prompts": [
+                {
+                    "id": prompt_id,
+                    "name": prompt_name,
+                    "prompt": prompt_text
+                }
+            ],
+            "post_process_selected_prompt_id": selected_id,
+            "external_script_path": null
+            // NOTE: no settings_schema_version → deserializes as 0
+        });
+        serde_json::from_value(v12_json).expect("v12 fixture must deserialize")
+    }
+
+    #[test]
+    fn migration_v12_to_v13_preserves_custom_prompt() {
+        let mut settings = make_v12_fixture(
+            "prompt_custom_123",
+            "My Custom Prompt",
+            "Do something with: ${output}",
+            Some("prompt_custom_123"),
+            "option+shift+space",
+        );
+        assert_eq!(settings.settings_schema_version, 0);
+
+        let migrated = migrate_settings_if_needed(&mut settings);
+        assert!(migrated, "first call must return true");
+
+        // Custom mode preserved
+        assert!(
+            settings
+                .smart_modes
+                .iter()
+                .any(|m| m.id == "prompt_custom_123" && m.name == "My Custom Prompt"),
+            "custom prompt must be preserved as a SmartMode"
+        );
+        // Clean Up exists
+        assert!(
+            settings
+                .smart_modes
+                .iter()
+                .any(|m| m.id == CLEAN_UP_MODE_ID),
+            "Clean Up must exist"
+        );
+        // Active id is set
+        assert!(settings.smart_mode_active_id.is_some());
+        assert_eq!(settings.settings_schema_version, 1);
+    }
+
+    #[test]
+    fn migration_v12_pristine_improve_transcriptions_replaced_by_clean_up() {
+        let pristine_prompt = default_post_process_prompts()
+            .into_iter()
+            .next()
+            .unwrap()
+            .prompt;
+        let mut settings = make_v12_fixture(
+            "default_improve_transcriptions",
+            "Improve Transcriptions",
+            &pristine_prompt,
+            Some("default_improve_transcriptions"),
+            "option+shift+space",
+        );
+
+        migrate_settings_if_needed(&mut settings);
+
+        // No mode named "Improve Transcriptions"
+        assert!(
+            !settings
+                .smart_modes
+                .iter()
+                .any(|m| m.name == "Improve Transcriptions"),
+            "pristine Improve Transcriptions must not survive migration"
+        );
+        // Clean Up exists
+        assert!(
+            settings
+                .smart_modes
+                .iter()
+                .any(|m| m.id == CLEAN_UP_MODE_ID),
+            "Clean Up must exist"
+        );
+        // Active id points to Clean Up
+        assert_eq!(
+            settings.smart_mode_active_id.as_deref(),
+            Some(CLEAN_UP_MODE_ID)
+        );
+    }
+
+    #[test]
+    fn migration_v12_edited_improve_transcriptions_kept_plus_clean_up() {
+        let mut settings = make_v12_fixture(
+            "default_improve_transcriptions",
+            "Improve Transcriptions",
+            "My edited prompt: ${output}", // different from pristine
+            Some("default_improve_transcriptions"),
+            "option+shift+space",
+        );
+
+        migrate_settings_if_needed(&mut settings);
+
+        // The edited mode is preserved (id = "default_improve_transcriptions")
+        assert!(
+            settings
+                .smart_modes
+                .iter()
+                .any(|m| m.id == "default_improve_transcriptions"),
+            "edited Improve Transcriptions mode must be preserved"
+        );
+        // Clean Up also exists
+        assert!(
+            settings
+                .smart_modes
+                .iter()
+                .any(|m| m.id == CLEAN_UP_MODE_ID),
+            "Clean Up must also exist"
+        );
+    }
+
+    #[test]
+    fn migration_idempotent() {
+        let mut settings = make_v12_fixture(
+            "prompt_custom_123",
+            "My Custom Prompt",
+            "Do something with: ${output}",
+            Some("prompt_custom_123"),
+            "option+shift+space",
+        );
+
+        let first = migrate_settings_if_needed(&mut settings);
+        assert!(first, "first call must return true");
+
+        let len_after_first = settings.smart_modes.len();
+        let second = migrate_settings_if_needed(&mut settings);
+        assert!(!second, "second call must return false");
+        assert_eq!(
+            settings.smart_modes.len(),
+            len_after_first,
+            "smart_modes must not grow on second call"
+        );
+    }
+
+    #[test]
+    fn migration_stamps_version() {
+        let mut settings = make_v12_fixture(
+            "default_improve_transcriptions",
+            "Improve Transcriptions",
+            &default_post_process_prompts()[0].prompt,
+            None,
+            "option+shift+space",
+        );
+        assert_eq!(settings.settings_schema_version, 0);
+        migrate_settings_if_needed(&mut settings);
+        assert_eq!(settings.settings_schema_version, 1);
+    }
+
+    #[test]
+    fn migration_active_selection() {
+        let mut settings = make_v12_fixture(
+            "prompt_custom_123",
+            "My Custom Prompt",
+            "Do something: ${output}",
+            Some("prompt_custom_123"),
+            "option+shift+space",
+        );
+        migrate_settings_if_needed(&mut settings);
+        // The selected prompt id was "prompt_custom_123" — that mode is migrated with same id
+        assert_eq!(
+            settings.smart_mode_active_id.as_deref(),
+            Some("prompt_custom_123")
+        );
+    }
+
+    #[test]
+    fn migration_transfers_post_process_combo() {
+        let combo = "option+shift+space";
+        let mut settings = make_v12_fixture(
+            "default_improve_transcriptions",
+            "Improve Transcriptions",
+            &default_post_process_prompts()[0].prompt,
+            Some("default_improve_transcriptions"),
+            combo,
+        );
+        migrate_settings_if_needed(&mut settings);
+
+        // transcribe_with_post_process must be removed
+        assert!(
+            !settings
+                .bindings
+                .contains_key("transcribe_with_post_process"),
+            "transcribe_with_post_process binding must be retired after migration"
+        );
+        // A smart_mode_ prefixed key must exist with the transferred combo
+        let active_id = settings.smart_mode_active_id.as_deref().unwrap();
+        let key = format!("smart_mode_{}", active_id);
+        let binding = settings
+            .bindings
+            .get(&key)
+            .expect("smart_mode_ binding must exist after migration");
+        assert_eq!(
+            binding.current_binding, combo,
+            "transferred combo must match original"
+        );
+    }
+
+    // ── reconcile_dangling_smart_mode_bindings tests ─────────────────────────
+
+    fn make_settings_with_modes_and_bindings(
+        modes: Vec<SmartMode>,
+        binding_keys: &[&str],
+    ) -> AppSettings {
+        let mut settings = get_default_settings();
+        settings.smart_modes = modes;
+        for key in binding_keys {
+            settings.bindings.insert(
+                key.to_string(),
+                ShortcutBinding {
+                    id: key.to_string(),
+                    name: key.to_string(),
+                    description: String::new(),
+                    default_binding: String::new(),
+                    current_binding: "option+shift+x".to_string(),
+                },
+            );
+        }
+        settings
+    }
+
+    #[test]
+    fn reconcile_removes_orphaned_smart_mode_binding() {
+        // "ghost" has no corresponding mode in smart_modes
+        let modes = vec![SmartMode {
+            id: "mode_clean_up".to_string(),
+            name: "Clean Up".to_string(),
+            kind: SmartModeKind::Rewrite,
+            prompt: "p".to_string(),
+            target_language: None,
+        }];
+        let mut settings = make_settings_with_modes_and_bindings(
+            modes,
+            &["smart_mode_ghost", "smart_mode_mode_clean_up"],
+        );
+
+        let changed = reconcile_dangling_smart_mode_bindings(&mut settings);
+
+        assert!(changed, "must return true when a binding was removed");
+        assert!(
+            !settings.bindings.contains_key("smart_mode_ghost"),
+            "orphaned smart_mode_ghost must be removed"
+        );
+        assert!(
+            settings.bindings.contains_key("smart_mode_mode_clean_up"),
+            "live smart_mode_mode_clean_up must be kept"
+        );
+    }
+
+    #[test]
+    fn reconcile_keeps_non_smart_mode_bindings() {
+        let modes = vec![SmartMode {
+            id: "mode_clean_up".to_string(),
+            name: "Clean Up".to_string(),
+            kind: SmartModeKind::Rewrite,
+            prompt: "p".to_string(),
+            target_language: None,
+        }];
+        let mut settings = make_settings_with_modes_and_bindings(
+            modes,
+            &["transcribe", "smart_mode_mode_clean_up"],
+        );
+
+        let changed = reconcile_dangling_smart_mode_bindings(&mut settings);
+
+        assert!(!changed, "must return false when nothing was removed");
+        assert!(
+            settings.bindings.contains_key("transcribe"),
+            "non-smart-mode binding must be kept"
+        );
+        assert!(
+            settings.bindings.contains_key("smart_mode_mode_clean_up"),
+            "live smart_mode binding must be kept"
+        );
+    }
+
+    #[test]
+    fn reconcile_returns_false_when_nothing_to_remove() {
+        let modes = vec![SmartMode {
+            id: "mode_clean_up".to_string(),
+            name: "Clean Up".to_string(),
+            kind: SmartModeKind::Rewrite,
+            prompt: "p".to_string(),
+            target_language: None,
+        }];
+        let mut settings = make_settings_with_modes_and_bindings(modes, &["transcribe"]);
+
+        let changed = reconcile_dangling_smart_mode_bindings(&mut settings);
+        assert!(
+            !changed,
+            "must return false when no smart_mode_* bindings present"
+        );
     }
 }

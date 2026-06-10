@@ -379,7 +379,7 @@
             "custom": "Custom (local)"
           },
           "descriptions": {
-            "apple_intelligence": "Free • on-device • macOS Apple Silicon",
+            "apple_intelligence": "No download required — macOS Apple Silicon",
             "custom": "Ollama / LM Studio on localhost"
           }
         },
@@ -443,10 +443,42 @@
           "cloudSelectedNotice": "Votre modèle sélectionné est un fournisseur cloud. Cliquez sur l'onglet « Cloud » ci-dessous pour le voir, ou choisissez un modèle local."
         },
         "library": {
-          "title": "Bibliothèque de modèles locaux",
-          "comingSoonBadge": "Bientôt",
-          "comingSoonBody": "La bibliothèque locale arrive dans la prochaine étape : téléchargement intégré de modèles GGUF (recommandé : gemma3:4b), gestion hors ligne, et exécution embarquée.",
-          "currentBridge": "En attendant, utilisez Custom (local) avec Ollama pour exécuter vos modèles localement."
+          "title": "Local Model Library",
+          "description": "Download and manage local GGUF models. Models run entirely on your device — no data leaves your machine.",
+          "yourModels": "Your Models",
+          "availableModels": "Available to Download",
+          "recommendedBadge": "Recommended",
+          "downloadModel": "Download model",
+          "activateModel": "Use this model",
+          "addCustomModel": "Add custom model",
+          "dropZoneLabel": "Drop a .gguf file here",
+          "dropZoneSublabel": "or use the button above",
+          "invalidGguf": "Not a valid GGUF model file. Please select a .gguf file.",
+          "cancelDownload": "Cancel download",
+          "models": {
+            "qwen25_1b5": {
+              "description": "Fast, lightweight — runs on any machine"
+            },
+            "gemma3_4b": {
+              "description": "Excellent for translation — versatile and multilingual"
+            },
+            "phi4_mini": {
+              "description": "Precise instruction-following — formatting and structure"
+            },
+            "llama32_3b": {
+              "description": "Balanced generalist — solid multilingual quality"
+            },
+            "translateGemma4b": {
+              "description": "Dedicated translation model — 55 benchmarked languages"
+            }
+          }
+        },
+        "embedded": {
+          "noModelHeading": "No local model selected",
+          "noModelBody": "Download a model below to enable embedded processing. The Qwen2.5-1.5B model is recommended for most machines.",
+          "downloadNowLink": "Download a model",
+          "providerLabel": "Embedded (local)",
+          "providerDescription": "Runs on your device. Requires a downloaded local model."
         }
       },
       "prompts": {
@@ -678,7 +710,11 @@
     "modelLoadFailed": "Failed to load model: {{model}}",
     "modelLoadFailedUnknown": "unknown model",
     "pasteFailedTitle": "Failed to Paste Text",
-    "pasteFailed": "Text could not be pasted into the active application."
+    "pasteFailed": "Text could not be pasted into the active application.",
+    "boundary": {
+      "title": "Something went wrong.",
+      "reload": "Reload"
+    }
   },
   "appLanguage": {
     "title": "Application Language",
@@ -687,5 +723,103 @@
   "overlay": {
     "transcribing": "Transcribing...",
     "processing": "Processing..."
+  },
+  "smartModes": {
+    "sections": {
+      "rewrite": "Rewrite",
+      "translation": "Translation"
+    },
+    "createRewrite": "New Rewrite",
+    "createTranslation": "New Translation",
+    "card": {
+      "saveCta": "Save mode",
+      "discardCta": "Discard changes",
+      "createCta": "Create mode",
+      "discardNewCta": "Discard",
+      "addShortcut": "Add shortcut",
+      "shortcutConflict": "Already used by: {{name}}",
+      "shortcutConflictBase": "The start of this shortcut ({{base}}) is already used by {{name}} — it would fire before the next key",
+      "shortcutBaseHint": "A shortcut whose start matches another shortcut can't work — the first key fires before you finish.",
+      "targetLanguage": "Target language",
+      "nameLabel": "Name",
+      "namePlaceholder": "e.g. Make Concise",
+      "promptLabel": "Prompt",
+      "promptPlaceholder": "Rewrite the following text to be more concise.\n\nText:\n${output}",
+      "outputHint": "Use ${output} where the dictated transcript should be inserted."
+    },
+    "picker": {
+      "rewriteTitle": "Add a rewrite mode",
+      "translationTitle": "Add a translation mode",
+      "custom": "Custom",
+      "customSubtext": "Create a mode with your own name and prompt",
+      "added": "Added",
+      "overwriteTitle": "Mode already exists",
+      "overwriteConfirm": "\"{{name}}\" already exists. Re-adding it will overwrite the existing mode. Continue?"
+    },
+    "shortcut": {
+      "clear": "Clear",
+      "clearAriaLabel": "Clear shortcut {{combo}}",
+      "recording": "Press keys…"
+    },
+    "kind": {
+      "rewrite": "Rewrite",
+      "translation": "Translation"
+    },
+    "translation": {
+      "enableHeading": "Enable offline translation",
+      "enableBody": "Translation runs fully offline through the embedded LLM. Choose an engine to get started.",
+      "chooseCta": "Choose translation engine",
+      "genericEngineNote": "Best-effort — quality varies by model",
+      "changeEngine": "Change engine",
+      "currentEngine": "Using: {{engine}}",
+      "engineGeneric": "Active model",
+      "modal": {
+        "footnote": "Both options run fully offline. You can change this choice later in settings.",
+        "applying": "Applying…",
+        "applyFailed": "Could not change the translation engine.",
+        "activeBadge": "Currently used",
+        "activeButton": "Currently used",
+        "downloadingPercent": "Downloading… {{percent}}%",
+        "downloadBackgroundNote": "You can close this window — the download continues in the background.",
+        "verifying": "Verifying download…",
+        "title": "Set up offline translation",
+        "recommendedHeading": "Recommended: Gemma 3 4B",
+        "recommendedSubtext": "A versatile 4B model with clean, reliable translation across languages and idioms. ~2.5 GB download.",
+        "downloadRecommended": "Download Gemma 3 4B",
+        "useRecommended": "Use Gemma 3 4B",
+        "currentHeading": "Use your current model",
+        "currentSubtext": "Translate with {{model}} (your active model). Quality varies by model.",
+        "currentNone": "No local model is active yet. Download one from the model library first.",
+        "useCurrent": "Use current model",
+        "recommendOnlyHeading": "Gemma 3 4B recommended for translation",
+        "recommendOnlyBody": "For the best translation quality, select Gemma 3 4B in the model selector above. Translation runs through your single active model.",
+        "enableCta": "Enable offline translation"
+      },
+      "recommendNote": "Gemma 3 4B is recommended for translation. Choose it in the model selector above."
+    },
+    "delete": {
+      "title": "Delete mode",
+      "confirm": "Delete \"{{name}}\"? This will also remove its shortcut binding.",
+      "ariaLabel": "Delete {{name}}"
+    },
+    "edit": {
+      "ariaLabel": "Edit {{name}}"
+    },
+    "noModel": {
+      "heading": "No local model selected",
+      "body": "Select or download a local model above to use Smart Modes."
+    },
+    "defaultModes": {
+      "cleanUp": "Clean Up",
+      "makeFormal": "Make Formal",
+      "makeCasual": "Make Casual",
+      "writeAsEmail": "Write as Email",
+      "bulletPoints": "Bullet Points",
+      "summarize": "Summarize",
+      "translateToEnglish": "Translate to English",
+      "translateToSpanish": "Translate to Spanish",
+      "translateToFrench": "Translate to French",
+      "translateToChinese": "Translate to Chinese"
+    }
   }
 }

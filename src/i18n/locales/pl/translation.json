@@ -213,7 +213,7 @@
         "auto": "Auto"
       },
       "pushToTalk": {
-        "label": "Push To Talk",
+        "label": "Naciśnij, aby mówić",
         "description": "Przytrzymaj, aby nagrywać, puść, aby zatrzymać"
       }
     },
@@ -379,7 +379,7 @@
             "custom": "Custom (lokalnie)"
           },
           "descriptions": {
-            "apple_intelligence": "Bezpłatnie • na urządzeniu • macOS Apple Silicon",
+            "apple_intelligence": "Nie wymaga pobierania — macOS Apple Silicon",
             "custom": "Ollama / LM Studio na localhost"
           }
         },
@@ -443,10 +443,42 @@
           "cloudSelectedNotice": "Wybrany model to dostawca chmury. Kliknij kartę „Chmura\" poniżej, aby go zobaczyć, lub wybierz model lokalny."
         },
         "library": {
-          "title": "Biblioteka modeli lokalnych",
-          "comingSoonBadge": "Wkrótce",
-          "comingSoonBody": "Lokalna biblioteka pojawi się w następnym kroku: zintegrowane pobieranie modeli GGUF (zalecane: gemma3:4b), zarządzanie offline i wbudowane wykonanie.",
-          "currentBridge": "W międzyczasie używaj Custom (local) z Ollama, aby uruchamiać modele lokalnie."
+          "title": "Biblioteka lokalnych modeli",
+          "description": "Pobieraj lokalne modele GGUF i zarządzaj nimi. Modele działają w całości na twoim urządzeniu — żadne dane nie opuszczają komputera.",
+          "yourModels": "Twoje modele",
+          "availableModels": "Dostępne do pobrania",
+          "recommendedBadge": "Zalecany",
+          "downloadModel": "Pobierz model",
+          "activateModel": "Użyj tego modelu",
+          "addCustomModel": "Dodaj własny model",
+          "dropZoneLabel": "Upuść tutaj plik .gguf",
+          "dropZoneSublabel": "lub użyj przycisku powyżej",
+          "invalidGguf": "Nieprawidłowy plik modelu GGUF. Wybierz plik .gguf.",
+          "cancelDownload": "Anuluj pobieranie",
+          "models": {
+            "qwen25_1b5": {
+              "description": "Szybki i lekki — działa na każdym komputerze"
+            },
+            "gemma3_4b": {
+              "description": "Doskonały do tłumaczenia — wszechstronny i wielojęzyczny"
+            },
+            "phi4_mini": {
+              "description": "Precyzyjne wykonywanie instrukcji — formatowanie i struktura"
+            },
+            "llama32_3b": {
+              "description": "Zrównoważony generalista — solidna jakość wielojęzyczna"
+            },
+            "translateGemma4b": {
+              "description": "Dedykowany model tłumaczenia — 55 przetestowanych języków"
+            }
+          }
+        },
+        "embedded": {
+          "noModelHeading": "Nie wybrano lokalnego modelu",
+          "noModelBody": "Pobierz model poniżej, aby włączyć wbudowane przetwarzanie. Model Qwen2.5-1.5B jest zalecany dla większości komputerów.",
+          "downloadNowLink": "Pobierz model",
+          "providerLabel": "Wbudowany (lokalny)",
+          "providerDescription": "Działa na Twoim urządzeniu. Wymaga pobranego lokalnego modelu."
         }
       },
       "prompts": {
@@ -562,9 +594,9 @@
         "description": "Dodatkowy czas (w milisekundach) na kontynuowanie nagrywania po zwolnieniu klawisza, aby przechwycić końcowy dźwięk. 0 = brak dodatkowego bufora."
       },
       "simulateUpdaterRestart": {
-        "title": "Simulate Updater Restart",
-        "description": "Relaunches Dictus via the same API tauri-plugin-updater uses after applying an update. Use this to validate SHUT-03 (clean post-update relaunch) without publishing a throwaway test release.",
-        "button": "Simulate Restart"
+        "title": "Symuluj restart aktualizatora",
+        "description": "Ponownie uruchamia Dictus przez ten sam API, którego tauri-plugin-updater używa po zastosowaniu aktualizacji. Użyj tego, aby zweryfikować SHUT-03 (czysty restart po aktualizacji) bez publikowania jednorazowej wersji testowej.",
+        "button": "Symuluj restart"
       }
     },
     "about": {
@@ -588,9 +620,9 @@
         "button": "Wesprzyj"
       },
       "privacy": {
-        "title": "Privacy Policy",
-        "description": "Your voice stays on your device. Read our privacy policy.",
-        "button": "View Privacy Policy"
+        "title": "Polityka prywatności",
+        "description": "Twój głos pozostaje na Twoim urządzeniu. Przeczytaj naszą politykę prywatności.",
+        "button": "Zobacz politykę prywatności"
       },
       "networkSurface": {
         "title": "Powierzchnia sieciowa",
@@ -598,17 +630,17 @@
         "button": "Zobacz dokument prywatności"
       },
       "ecosystem": {
-        "title": "Dictus Ecosystem",
-        "description": "Dictus is available on iOS, Android, and Desktop.",
-        "button": "Learn More"
+        "title": "Ekosystem Dictus",
+        "description": "Dictus jest dostępny na iOS, Android i Desktop.",
+        "button": "Dowiedz się więcej"
       },
       "acknowledgments": {
         "title": "Podziękowania",
         "handy": {
           "title": "Handy",
-          "description": "Open-source desktop speech-to-text application by CJ Pais",
-          "details": "Dictus Desktop is a fork of Handy. Thanks to CJ Pais and the Handy community for building the foundation that Dictus is built upon.",
-          "button": "View on GitHub"
+          "description": "Otwartoźródłowa aplikacja desktopowa do rozpoznawania mowy autorstwa CJ Pais",
+          "details": "Dictus Desktop jest forkiem Handy. Dziękujemy CJ Pais i społeczności Handy za zbudowanie fundamentu, na którym opiera się Dictus.",
+          "button": "Zobacz na GitHubie"
         },
         "whisper": {
           "title": "Whisper.cpp",
@@ -631,9 +663,9 @@
     "installing": "Instalowanie...",
     "preparing": "Przygotowywanie...",
     "checkForUpdates": "Sprawdź aktualizacje",
-    "portableUpdateTitle": "Manual update required",
-    "portableUpdateMessage": "Portable installs cannot be updated automatically. To update: download the latest NSIS installer from GitHub Releases, install it to the same folder, then copy your Data/ folder (settings, models, recordings) from the old version to the new one.",
-    "portableUpdateButton": "Open GitHub Releases"
+    "portableUpdateTitle": "Wymagana ręczna aktualizacja",
+    "portableUpdateMessage": "Przenośne instalacje nie mogą być aktualizowane automatycznie. Aby zaktualizować: pobierz najnowszy instalator NSIS z GitHub Releases, zainstaluj go w tym samym folderze, a następnie skopiuj folder Data/ (ustawienia, modele, nagrania) ze starej wersji do nowej.",
+    "portableUpdateButton": "Otwórz GitHub Releases"
   },
   "common": {
     "loading": "Wczytywanie...",
@@ -678,7 +710,11 @@
     "modelLoadFailed": "Nie udało się załadować modelu: {{model}}",
     "modelLoadFailedUnknown": "nieznany model",
     "pasteFailedTitle": "Nie udało się wkleić tekstu",
-    "pasteFailed": "Nie można było wkleić tekstu do aktywnej aplikacji."
+    "pasteFailed": "Nie można było wkleić tekstu do aktywnej aplikacji.",
+    "boundary": {
+      "title": "Coś poszło nie tak.",
+      "reload": "Przeładuj"
+    }
   },
   "appLanguage": {
     "title": "Język aplikacji",
@@ -687,5 +723,103 @@
   "overlay": {
     "transcribing": "Transkrypcja...",
     "processing": "Przetwarzanie..."
+  },
+  "smartModes": {
+    "sections": {
+      "rewrite": "Przepisywanie",
+      "translation": "Tłumaczenie"
+    },
+    "createRewrite": "Nowe przepisanie",
+    "createTranslation": "Nowe tłumaczenie",
+    "card": {
+      "saveCta": "Zapisz tryb",
+      "discardCta": "Odrzuć zmiany",
+      "createCta": "Utwórz tryb",
+      "discardNewCta": "Odrzuć",
+      "addShortcut": "Dodaj skrót",
+      "shortcutConflict": "Już używany przez: {{name}}",
+      "shortcutConflictBase": "Początek tego skrótu ({{base}}) jest już używany przez {{name}} — wywoła się przed następnym klawiszem",
+      "shortcutBaseHint": "Skrót, którego początek pokrywa się z innym skrótem, nie może działać — pierwszy klawisz wywołuje się przed ukończeniem wpisywania.",
+      "targetLanguage": "Język docelowy",
+      "nameLabel": "Nazwa",
+      "promptLabel": "Polecenie",
+      "namePlaceholder": "np. Zrób zwięzłym",
+      "promptPlaceholder": "Przepisz poniższy tekst, aby był bardziej zwięzły.\n\nTekst:\n${output}",
+      "outputHint": "Użyj ${output} w miejscu, gdzie ma być wstawiony podyktowany transkrypt."
+    },
+    "picker": {
+      "rewriteTitle": "Dodaj tryb przepisywania",
+      "translationTitle": "Dodaj tryb tłumaczenia",
+      "custom": "Własny",
+      "customSubtext": "Utwórz tryb z własną nazwą i poleceniem",
+      "added": "Dodano",
+      "overwriteTitle": "Tryb już istnieje",
+      "overwriteConfirm": "„{{name}}\" już istnieje. Ponowne dodanie go nadpisze istniejący tryb. Kontynuować?"
+    },
+    "shortcut": {
+      "clear": "Wyczyść",
+      "clearAriaLabel": "Wyczyść skrót {{combo}}",
+      "recording": "Naciśnij klawisze…"
+    },
+    "kind": {
+      "rewrite": "Przepisywanie",
+      "translation": "Tłumaczenie"
+    },
+    "translation": {
+      "enableHeading": "Włącz tłumaczenie offline",
+      "enableBody": "Tłumaczenie działa w pełni offline przez wbudowany model językowy. Wybierz silnik, aby zacząć.",
+      "chooseCta": "Wybierz silnik tłumaczenia",
+      "genericEngineNote": "Najlepszy wysiłek — jakość zależy od modelu",
+      "changeEngine": "Zmień silnik",
+      "currentEngine": "Używany: {{engine}}",
+      "engineGeneric": "Aktywny model",
+      "modal": {
+        "footnote": "Obie opcje działają w pełni offline. Możesz zmienić ten wybór później w ustawieniach.",
+        "applying": "Stosowanie…",
+        "applyFailed": "Nie udało się zmienić silnika tłumaczenia.",
+        "activeBadge": "Aktualnie używany",
+        "activeButton": "Aktualnie używany",
+        "downloadingPercent": "Pobieranie… {{percent}}%",
+        "downloadBackgroundNote": "Możesz zamknąć to okno — pobieranie trwa w tle.",
+        "verifying": "Weryfikacja pobierania…",
+        "title": "Skonfiguruj tłumaczenie offline",
+        "recommendedHeading": "Zalecany: Gemma 3 4B",
+        "recommendedSubtext": "Wszechstronny model 4B z niezawodnym tłumaczeniem w wielu językach. ~2,5 GB pobierania.",
+        "downloadRecommended": "Pobierz Gemma 3 4B",
+        "useRecommended": "Użyj Gemma 3 4B",
+        "currentHeading": "Użyj bieżącego modelu",
+        "currentSubtext": "Tłumacz za pomocą {{model}} (aktywny model). Jakość zależy od modelu.",
+        "currentNone": "Żaden lokalny model nie jest jeszcze aktywny. Najpierw pobierz jeden z biblioteki modeli.",
+        "useCurrent": "Użyj bieżącego modelu",
+        "recommendOnlyHeading": "Gemma 3 4B zalecany do tłumaczenia",
+        "recommendOnlyBody": "Aby uzyskać najlepszą jakość tłumaczenia, wybierz Gemma 3 4B w selektorze modeli powyżej. Tłumaczenie odbywa się przez Twój jedyny aktywny model.",
+        "enableCta": "Włącz tłumaczenie offline"
+      },
+      "recommendNote": "Gemma 3 4B jest zalecany do tłumaczenia. Wybierz go w selektorze modeli powyżej."
+    },
+    "delete": {
+      "title": "Usuń tryb",
+      "confirm": "Usunąć „{{name}}\"? Spowoduje to również usunięcie powiązanego skrótu.",
+      "ariaLabel": "Usuń {{name}}"
+    },
+    "edit": {
+      "ariaLabel": "Edytuj {{name}}"
+    },
+    "noModel": {
+      "heading": "Nie wybrano lokalnego modelu",
+      "body": "Wybierz lub pobierz lokalny model powyżej, aby korzystać z trybów inteligentnych."
+    },
+    "defaultModes": {
+      "cleanUp": "Wyczyść",
+      "makeFormal": "Sformalizuj",
+      "makeCasual": "Spraw, by był swobodny",
+      "writeAsEmail": "Napisz jako e-mail",
+      "bulletPoints": "Punkty",
+      "summarize": "Podsumuj",
+      "translateToEnglish": "Przetłumacz na angielski",
+      "translateToSpanish": "Przetłumacz na hiszpański",
+      "translateToFrench": "Przetłumacz na francuski",
+      "translateToChinese": "Przetłumacz na chiński"
+    }
   }
 }

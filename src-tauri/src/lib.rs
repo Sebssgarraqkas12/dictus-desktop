@@ -28,6 +28,7 @@ use tauri_specta::{collect_commands, collect_events, Builder};
 use env_filter::Builder as EnvFilterBuilder;
 use managers::audio::AudioRecordingManager;
 use managers::history::HistoryManager;
+use managers::llm::LlmManager;
 use managers::model::ModelManager;
 use managers::transcription::TranscriptionManager;
 #[cfg(unix)]
@@ -80,6 +81,10 @@ fn level_filter_from_u8(value: u8) -> log::LevelFilter {
 /// not silently revert it.
 fn flush_and_exit(app: &AppHandle, code: i32) {
     log::info!("SHUT-02: flush_and_exit invoked (code={})", code);
+    // Stop the LLM idle watcher thread so it doesn't outlive the process.
+    if let Some(llm_manager) = app.try_state::<Arc<LlmManager>>() {
+        llm_manager.shutdown();
+    }
     log::logger().flush();
     #[cfg(target_os = "macos")]
     {
@@ -213,6 +218,8 @@ fn initialize_core_logic(app_handle: &AppHandle) {
     );
     let history_manager =
         Arc::new(HistoryManager::new(app_handle).expect("Failed to initialize history manager"));
+    let llm_manager =
+        Arc::new(LlmManager::new(app_handle).expect("Failed to initialize LLM manager"));
 
     // Apply accelerator preferences before any model loads
     managers::transcription::apply_accelerator_settings(app_handle);
@@ -222,6 +229,7 @@ fn initialize_core_logic(app_handle: &AppHandle) {
     app_handle.manage(model_manager.clone());
     app_handle.manage(transcription_manager.clone());
     app_handle.manage(history_manager.clone());
+    app_handle.manage(llm_manager.clone());
 
     // Note: Shortcuts are NOT initialized here.
     // The frontend is responsible for calling the `initialize_shortcuts` command
@@ -440,9 +448,19 @@ pub fn run(cli_args: CliArgs) {
             shortcut::update_post_process_prompt,
             shortcut::delete_post_process_prompt,
             shortcut::set_post_process_selected_prompt,
+            shortcut::add_smart_mode,
+            shortcut::update_smart_mode,
+            shortcut::delete_smart_mode,
+            shortcut::set_active_smart_mode,
+            shortcut::list_smart_modes,
+            shortcut::set_smart_mode_binding,
+            shortcut::clear_smart_mode_binding,
+            shortcut::smart_mode_templates,
             shortcut::update_custom_words,
             shortcut::suspend_binding,
             shortcut::resume_binding,
+            shortcut::suspend_all_shortcuts,
+            shortcut::resume_all_shortcuts,
             shortcut::change_mute_while_recording_setting,
             shortcut::change_append_trailing_space_setting,
             shortcut::change_lazy_stream_close_setting,
@@ -484,6 +502,14 @@ pub fn run(cli_args: CliArgs) {
             commands::models::is_model_loading,
             commands::models::has_any_models_available,
             commands::models::has_any_models_or_downloads,
+            commands::llm::get_llm_models,
+            commands::llm::download_llm_model,
+            commands::llm::cancel_llm_download,
+            commands::llm::delete_llm_model,
+            commands::llm::set_active_llm_model,
+            commands::llm::get_active_llm_model,
+            commands::llm::import_custom_llm_model,
+            commands::llm::set_translation_engine_choice,
             commands::audio::update_microphone_mode,
             commands::audio::get_microphone_mode,
             commands::audio::get_windows_microphone_permission_status,
@@ -511,7 +537,10 @@ pub fn run(cli_args: CliArgs) {
             commands::history::update_recording_retention_period,
             helpers::clamshell::is_laptop,
         ])
-        .events(collect_events![managers::history::HistoryUpdatePayload,]);
+        .events(collect_events![
+            managers::history::HistoryUpdatePayload,
+            managers::llm::LlmDownloadProgress,
+        ]);
 
     #[cfg(debug_assertions)] // <- Only export on non-release builds
     specta_builder
@@ -625,6 +654,17 @@ pub fn run(cli_args: CliArgs) {
             app.manage(TranscriptionCoordinator::new(app_handle.clone()));
 
             initialize_core_logic(&app_handle);
+
+            // Pre-warm GPU/accelerator enumeration on a background thread.
+            // The first call into transcribe_rs::whisper_cpp::gpu::list_gpu_devices
+            // loads the Metal/Vulkan backend and probes devices, which can take
+            // several seconds. Without this, that cost is paid synchronously the
+            // first time the user opens the Advanced settings page (which calls
+            // the get_available_accelerators command), causing a UI freeze.
+            // Result is cached in a OnceLock inside the transcription manager.
+            std::thread::spawn(|| {
+                let _ = crate::managers::transcription::get_available_accelerators();
+            });
 
             // Hide tray icon if --no-tray was passed
             if cli_args.no_tray {

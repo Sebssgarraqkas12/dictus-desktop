@@ -3,65 +3,75 @@ import { useTranslation } from "react-i18next";
 import type { GroupedProviderOption } from "./usePostProcessProviderState";
 
 interface ProviderPickerProps {
-  localOptions: GroupedProviderOption[];
   externalOptions: GroupedProviderOption[];
   value: string;
   onChange: (value: string) => void;
   disabled?: boolean;
-  renderRowExtras?: (option: GroupedProviderOption) => React.ReactNode;
   activeTab: "local" | "cloud";
   onTabChange: (tab: "local" | "cloud") => void;
+  /**
+   * Fully composed on-device engine list (provider cards + GGUF model cards),
+   * rendered as the local tab body. Built by the parent so the active engine
+   * can be pinned to the top across both provider and model rows.
+   */
+  localContent?: React.ReactNode;
 }
 
 export const ProviderPicker: React.FC<ProviderPickerProps> = ({
-  localOptions,
   externalOptions,
   value,
   onChange,
   disabled,
-  renderRowExtras,
   activeTab,
   onTabChange,
+  localContent,
 }) => {
   const { t } = useTranslation();
 
+  // Cloud provider card — clickable, selection shown by accent border (no
+  // radio), matching the on-device cards for visual consistency.
+  const renderRow = (option: GroupedProviderOption) => {
+    const checked = value === option.value;
+    const selectable = !disabled;
+    return (
+      <div
+        key={option.value}
+        role="button"
+        aria-pressed={checked}
+        tabIndex={selectable ? 0 : undefined}
+        onClick={() => selectable && onChange(option.value)}
+        onKeyDown={(e) => {
+          if (selectable && (e.key === "Enter" || e.key === " ")) {
+            e.preventDefault();
+            onChange(option.value);
+          }
+        }}
+        className={`flex flex-col gap-1 px-4 py-3 rounded-xl border-2 transition-all ${
+          checked
+            ? "border-logo-primary/50 bg-logo-primary/10"
+            : "border-mid-gray/20 hover:border-logo-primary/50 hover:bg-logo-primary/5"
+        } ${disabled ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}`}
+      >
+        <span
+          className={`text-base font-semibold text-text ${
+            selectable ? "hover:text-logo-primary" : ""
+          } transition-colors`}
+        >
+          {option.label}
+        </span>
+        {option.description ? (
+          <p className="text-sm text-text/60">{option.description}</p>
+        ) : null}
+      </div>
+    );
+  };
+
   const renderSection = (title: string, options: GroupedProviderOption[]) => (
-    <fieldset className="space-y-1 border-0 p-0 m-0">
+    <fieldset className="space-y-3 border-0 p-0 m-0">
       <legend className="text-xs font-medium text-mid-gray uppercase tracking-wide mb-2">
         {title}
       </legend>
-      {options.map((option) => {
-        const checked = value === option.value;
-        return (
-          <label
-            key={option.value}
-            className={`flex flex-col gap-1 p-3 rounded-md border transition-colors ${
-              checked
-                ? "border-logo-primary bg-logo-primary/10"
-                : "border-mid-gray/20 hover:bg-mid-gray/5"
-            } ${disabled ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}`}
-          >
-            <div className="flex items-center gap-3">
-              <input
-                type="radio"
-                name="post-process-provider"
-                value={option.value}
-                checked={checked}
-                onChange={() => onChange(option.value)}
-                disabled={disabled}
-                className="accent-logo-primary"
-              />
-              <span className="text-sm font-medium">{option.label}</span>
-            </div>
-            {option.description ? (
-              <p className="text-xs text-mid-gray pl-7">{option.description}</p>
-            ) : null}
-            {renderRowExtras ? (
-              <div className="pl-7 mt-1">{renderRowExtras(option)}</div>
-            ) : null}
-          </label>
-        );
-      })}
+      {options.map((option) => renderRow(option))}
     </fieldset>
   );
 
@@ -102,12 +112,14 @@ export const ProviderPicker: React.FC<ProviderPickerProps> = ({
       </div>
 
       {/* Active section */}
-      {activeTab === "local" && localOptions.length > 0
-        ? renderSection(
-            t("settings.postProcessing.api.providers.sectionLocal"),
-            localOptions,
-          )
-        : null}
+      {activeTab === "local" ? (
+        <fieldset className="space-y-3 border-0 p-0 m-0">
+          <legend className="text-xs font-medium text-mid-gray uppercase tracking-wide mb-2">
+            {t("settings.postProcessing.api.providers.sectionLocal")}
+          </legend>
+          {localContent}
+        </fieldset>
+      ) : null}
 
       {activeTab === "cloud" && externalOptions.length > 0
         ? renderSection(

@@ -379,7 +379,7 @@
             "custom": "Custom (локално)"
           },
           "descriptions": {
-            "apple_intelligence": "Безплатно • на устройството • macOS Apple Silicon",
+            "apple_intelligence": "Не изисква изтегляне — macOS Apple Silicon",
             "custom": "Ollama / LM Studio на localhost"
           }
         },
@@ -444,9 +444,41 @@
         },
         "library": {
           "title": "Библиотека с локални модели",
-          "comingSoonBadge": "Скоро",
-          "comingSoonBody": "Локалната библиотека идва в следващата стъпка: интегрирано изтегляне на GGUF модели (препоръчано: gemma3:4b), офлайн управление и вградено изпълнение.",
-          "currentBridge": "Засега използвайте Custom (local) с Ollama за локално изпълнение на моделите ви."
+          "description": "Изтегляй и управлявай локални GGUF-модели. Моделите работят изцяло на твоето устройство — никакви данни не напускат компютъра ти.",
+          "yourModels": "Моите модели",
+          "availableModels": "Налични за изтегляне",
+          "recommendedBadge": "Препоръчан",
+          "downloadModel": "Изтегли модела",
+          "activateModel": "Използвай този модел",
+          "addCustomModel": "Добави собствен модел",
+          "dropZoneLabel": "Пусни .gguf файл тук",
+          "dropZoneSublabel": "или използвай бутона по-горе",
+          "invalidGguf": "Невалиден файл за модел GGUF. Моля, избери .gguf файл.",
+          "cancelDownload": "Отмени изтеглянето",
+          "models": {
+            "qwen25_1b5": {
+              "description": "Бърз и лек — работи на всеки компютър"
+            },
+            "gemma3_4b": {
+              "description": "Отличен за превод — универсален и многоезичен"
+            },
+            "phi4_mini": {
+              "description": "Точно следване на инструкции — форматиране и структура"
+            },
+            "llama32_3b": {
+              "description": "Балансиран универсалист — добро многоезично качество"
+            },
+            "translateGemma4b": {
+              "description": "Специализиран модел за превод — 55 тествани езика"
+            }
+          }
+        },
+        "embedded": {
+          "noModelHeading": "Не е избран локален модел",
+          "noModelBody": "Изтегли модел по-долу, за да активираш вградената обработка. Моделът Qwen2.5-1.5B се препоръчва за повечето компютри.",
+          "downloadNowLink": "Изтегли модел",
+          "providerLabel": "Вграден (локален)",
+          "providerDescription": "Работи на вашето устройство. Изисква изтеглен локален модел."
         }
       },
       "prompts": {
@@ -562,9 +594,9 @@
         "description": "Допълнително време (в милисекунди) за запис след пускане на клавиша, за да се улови краят на аудиото. 0 = без допълнителен буфер."
       },
       "simulateUpdaterRestart": {
-        "title": "Simulate Updater Restart",
-        "description": "Relaunches Dictus via the same API tauri-plugin-updater uses after applying an update. Use this to validate SHUT-03 (clean post-update relaunch) without publishing a throwaway test release.",
-        "button": "Simulate Restart"
+        "title": "Симулирай рестартиране за актуализация",
+        "description": "Рестартира Dictus чрез същия API, който tauri-plugin-updater използва след прилагане на актуализация. Използвай за проверка на SHUT-03 (чисто рестартиране след актуализация) без публикуване на еднократна тестова версия.",
+        "button": "Симулирай рестартиране"
       }
     },
     "about": {
@@ -588,9 +620,9 @@
         "button": "Дарение"
       },
       "privacy": {
-        "title": "Privacy Policy",
-        "description": "Your voice stays on your device. Read our privacy policy.",
-        "button": "View Privacy Policy"
+        "title": "Политика за поверителност",
+        "description": "Гласът ви остава на вашето устройство. Прочетете нашата политика за поверителност.",
+        "button": "Вижте политиката за поверителност"
       },
       "networkSurface": {
         "title": "Мрежова повърхност",
@@ -598,17 +630,17 @@
         "button": "Виж документа за поверителност"
       },
       "ecosystem": {
-        "title": "Dictus Ecosystem",
-        "description": "Dictus is available on iOS, Android, and Desktop.",
-        "button": "Learn More"
+        "title": "Екосистема Dictus",
+        "description": "Dictus е достъпен на iOS, Android и Desktop.",
+        "button": "Научи повече"
       },
       "acknowledgments": {
         "title": "Благодарности",
         "handy": {
           "title": "Handy",
-          "description": "Open-source desktop speech-to-text application by CJ Pais",
-          "details": "Dictus Desktop is a fork of Handy. Thanks to CJ Pais and the Handy community for building the foundation that Dictus is built upon.",
-          "button": "View on GitHub"
+          "description": "Приложение с отворен код за разпознаване на реч от CJ Pais",
+          "details": "Dictus Desktop е форк на Handy. Благодаря на CJ Pais и общността на Handy за изграждането на основата, върху която е изграден Dictus.",
+          "button": "Вижте в GitHub"
         },
         "whisper": {
           "title": "Whisper.cpp",
@@ -678,7 +710,11 @@
     "modelLoadFailed": "Зареждането на модела не бе успешно: {{model}}",
     "modelLoadFailedUnknown": "неизвестен модел",
     "pasteFailedTitle": "Неуспешно поставяне на текст",
-    "pasteFailed": "Текстът не можа да бъде поставен в активното приложение."
+    "pasteFailed": "Текстът не можа да бъде поставен в активното приложение.",
+    "boundary": {
+      "title": "Нещо се обърка.",
+      "reload": "Презареди"
+    }
   },
   "appLanguage": {
     "title": "Език на приложението",
@@ -687,5 +723,103 @@
   "overlay": {
     "transcribing": "Транскрибиране...",
     "processing": "Обработка..."
+  },
+  "smartModes": {
+    "sections": {
+      "rewrite": "Пренаписване",
+      "translation": "Превод"
+    },
+    "createRewrite": "Ново пренаписване",
+    "createTranslation": "Нов превод",
+    "card": {
+      "saveCta": "Запази режима",
+      "discardCta": "Отхвърли промените",
+      "createCta": "Създай режим",
+      "discardNewCta": "Отхвърли",
+      "addShortcut": "Добави клавишна комбинация",
+      "shortcutConflict": "Вече се използва от: {{name}}",
+      "shortcutConflictBase": "Началото на тази клавишна комбинация ({{base}}) вече се използва от {{name}} — ще се задейства преди следващия клавиш",
+      "shortcutBaseHint": "Клавишна комбинация, чието начало съвпада с друга, не може да работи — първият клавиш се задейства преди да завършиш.",
+      "targetLanguage": "Целеви език",
+      "nameLabel": "Име",
+      "promptLabel": "Инструкция",
+      "namePlaceholder": "напр. Направи кратко",
+      "promptPlaceholder": "Пренапиши следния текст, за да го направиш по-кратък.\n\nТекст:\n${output}",
+      "outputHint": "Използвай ${output} там, където трябва да се вмъкне диктуваният транскрипт."
+    },
+    "picker": {
+      "rewriteTitle": "Добави режим на пренаписване",
+      "translationTitle": "Добави режим на превод",
+      "custom": "Персонализиран",
+      "customSubtext": "Създай режим с собствено име и инструкция",
+      "added": "Добавено",
+      "overwriteTitle": "Режимът вече съществува",
+      "overwriteConfirm": "„{{name}}\" вече съществува. Повторното добавяне ще презапише съществуващия режим. Продължи?"
+    },
+    "shortcut": {
+      "clear": "Изчисти",
+      "clearAriaLabel": "Изчисти клавишната комбинация {{combo}}",
+      "recording": "Натисни клавишите…"
+    },
+    "kind": {
+      "rewrite": "Пренаписване",
+      "translation": "Превод"
+    },
+    "translation": {
+      "enableHeading": "Активирай офлайн превод",
+      "enableBody": "Преводът се изпълнява изцяло офлайн чрез вградения езиков модел. Избери двигател, за да започнеш.",
+      "chooseCta": "Избери двигател за превод",
+      "genericEngineNote": "Максимален усилие — качеството зависи от модела",
+      "changeEngine": "Смени двигателя",
+      "currentEngine": "Използван: {{engine}}",
+      "engineGeneric": "Активен модел",
+      "modal": {
+        "footnote": "И двете опции работят изцяло офлайн. Можеш да промениш избора по-късно в настройките.",
+        "applying": "Прилагане…",
+        "applyFailed": "Неуспешна смяна на двигателя за превод.",
+        "activeBadge": "Използван в момента",
+        "activeButton": "Използван в момента",
+        "downloadingPercent": "Изтегляне… {{percent}}%",
+        "downloadBackgroundNote": "Можеш да затвориш прозореца — изтеглянето продължава на заден план.",
+        "verifying": "Проверка на изтеглянето…",
+        "title": "Настрой офлайн превод",
+        "recommendedHeading": "Препоръчан: Gemma 3 4B",
+        "recommendedSubtext": "Универсален модел 4B с надежден превод на много езици. ~2,5 ГБ за изтегляне.",
+        "downloadRecommended": "Изтегли Gemma 3 4B",
+        "useRecommended": "Използвай Gemma 3 4B",
+        "currentHeading": "Използвай текущия модел",
+        "currentSubtext": "Превеждай с {{model}} (активен модел). Качеството зависи от модела.",
+        "currentNone": "Все още няма активен локален модел. Изтегли първо един от библиотеката с модели.",
+        "useCurrent": "Използвай текущия модел",
+        "recommendOnlyHeading": "Gemma 3 4B се препоръчва за превод",
+        "recommendOnlyBody": "За най-добро качество на превода избери Gemma 3 4B в селектора на модели по-горе. Преводът се извършва чрез единствения ти активен модел.",
+        "enableCta": "Активирай офлайн превод"
+      },
+      "recommendNote": "Gemma 3 4B се препоръчва за превод. Избери го в селектора на модели по-горе."
+    },
+    "delete": {
+      "title": "Изтрий режима",
+      "confirm": "Изтриване на „{{name}}\"? Свързаната клавишна комбинация също ще бъде премахната.",
+      "ariaLabel": "Изтрий {{name}}"
+    },
+    "edit": {
+      "ariaLabel": "Редактирай {{name}}"
+    },
+    "noModel": {
+      "heading": "Не е избран локален модел",
+      "body": "Избери или изтегли локален модел по-горе, за да използваш умните режими."
+    },
+    "defaultModes": {
+      "cleanUp": "Изчистване",
+      "makeFormal": "Направи официално",
+      "makeCasual": "Направи непринудено",
+      "writeAsEmail": "Напиши като имейл",
+      "bulletPoints": "Точки",
+      "summarize": "Обобщи",
+      "translateToEnglish": "Преведи на английски",
+      "translateToSpanish": "Преведи на испански",
+      "translateToFrench": "Преведи на френски",
+      "translateToChinese": "Преведи на китайски"
+    }
   }
 }
