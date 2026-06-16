@@ -14,9 +14,27 @@ Read this top to bottom before starting a merge. Every command is copy-paste rea
 | Merge-base (v0.8.2) | `39e855d`                      | Last shared ancestor — Handy's v0.8.2 release; seed of `.github/upstream-sha.txt` |
 | Last sync           | see `.github/upstream-sha.txt` | Updated after each merge lands on main                                            |
 
-The file `.github/upstream-sha.txt` is the single source of truth for "where are we." The weekly detection action (`.github/workflows/upstream-sync.yml`) reads it and opens a tracking issue when upstream has new commits.
+The file `.github/upstream-sha.txt` is the single source of truth for "where are we." Compare it against `upstream/main` manually whenever you want to check for new upstream work (see [Checking for upstream changes](#checking-for-upstream-changes) below).
 
-**Important:** `upstream-sha.txt` is updated ONLY as part of the merge commit that lands on main. Never update it from the detection workflow — doing so would make the tracking issue disappear before the merge is actually done.
+> **History:** A weekly GitHub Action (`.github/workflows/upstream-sync.yml`) used to open a tracking issue on every detected delta. It was retired on 2026-06-16 because it could not advance `upstream-sha.txt` on its own (the file is only bumped during a merge), so it re-listed the same commits every week and piled up duplicate issues. Upstream tracking is now **manual and on-demand**.
+
+**Important:** `upstream-sha.txt` is updated ONLY as part of the merge commit that lands on main.
+
+---
+
+## Checking for upstream changes
+
+Run this whenever you want to see if upstream has moved (no schedule — do it when convenient):
+
+```bash
+git fetch upstream main --no-tags
+STORED=$(cat .github/upstream-sha.txt | tr -d '[:space:]')
+echo "Stored:   $STORED"
+echo "Upstream: $(git rev-parse upstream/main)"
+git log ${STORED}..upstream/main --oneline
+```
+
+If the log is empty, you're up to date. Otherwise, review the commits and cherry-pick only the ones aligned with Dictus's local-first direction (see [Fork Policy: Selective Cherry-Pick](#fork-policy-selective-cherry-pick)), then follow the merge process below.
 
 ---
 
@@ -204,7 +222,7 @@ git add README.md
 
 ```bash
 # Update upstream-sha.txt to the new upstream HEAD (full 40-char SHA)
-# MUST be full SHA — the detection workflow compares against `git rev-parse upstream/main`
+# MUST be full SHA — the manual check compares against `git rev-parse upstream/main`
 # which always returns 40 chars. Short SHAs produce a permanent false-positive.
 git rev-parse upstream/main > .github/upstream-sha.txt
 
@@ -257,20 +275,16 @@ Review in GitHub UI. After CI passes, merge with **"Create a merge commit"** (pr
 
 ## Anti-Patterns (Do NOT do these)
 
-| Anti-pattern                                          | Why it's wrong                                                                                                 | What to do instead                                                         |
-| ----------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------- |
-| `git checkout --theirs src-tauri/tauri.conf.json`     | Accepts Handy identity fields (productName, identifier, pubkey, endpoints)                                     | Resolve manually, field by field — keep Dictus values                      |
-| `git cherry-pick c1697b2 84d88f9 30b57c4 fdc8cb7`     | Loses the merge relationship; creates separate commits instead of one merge commit preserving upstream history | Use `git merge upstream/main --no-ff`                                      |
-| Hand-edit `Cargo.lock`                                | Machine-generated format; manual edits introduce subtle version conflicts                                      | Run `cargo generate-lockfile` after resolving `Cargo.toml`                 |
-| Update `upstream-sha.txt` from the detection workflow | Causes tracking issue to disappear before the merge is done (Pitfall 2)                                        | Only update `upstream-sha.txt` as part of the merge commit landing on main |
-| Skip `verify-sync.sh` before pushing                  | Identity regressions silently land on main                                                                     | Always run the validator; fix all failures before pushing                  |
-| Use `git merge --abort` on first conflict             | Abandons the entire merge; you lose the branch state                                                           | Resolve conflicts file by file — see Section 4                             |
+| Anti-pattern                                        | Why it's wrong                                                                                                 | What to do instead                                                         |
+| --------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------- |
+| `git checkout --theirs src-tauri/tauri.conf.json`   | Accepts Handy identity fields (productName, identifier, pubkey, endpoints)                                     | Resolve manually, field by field — keep Dictus values                      |
+| `git cherry-pick c1697b2 84d88f9 30b57c4 fdc8cb7`   | Loses the merge relationship; creates separate commits instead of one merge commit preserving upstream history | Use `git merge upstream/main --no-ff`                                      |
+| Hand-edit `Cargo.lock`                              | Machine-generated format; manual edits introduce subtle version conflicts                                      | Run `cargo generate-lockfile` after resolving `Cargo.toml`                 |
+| Update `upstream-sha.txt` outside of a merge commit | Marks upstream as "synced" before the merge actually lands on main                                             | Only update `upstream-sha.txt` as part of the merge commit landing on main |
+| Skip `verify-sync.sh` before pushing                | Identity regressions silently land on main                                                                     | Always run the validator; fix all failures before pushing                  |
+| Use `git merge --abort` on first conflict           | Abandons the entire merge; you lose the branch state                                                           | Resolve conflicts file by file — see Section 4                             |
 
 ---
-
-## Future: Phase 6 Automation
-
-Phase 6 replaces this manual runbook with an AI-driven pipeline: Claude Code agent #1 analyzes upstream commits for relevance, adapts code (identity preservation), and opens a PR. A second Claude Code agent reviews the PR and generates a manual test checklist. Pierre approves, tests, and releases. Until Phase 6 ships, this runbook is the process.
 
 ---
 
@@ -294,7 +308,6 @@ Phase 6 replaces this manual runbook with an AI-driven pipeline: Claude Code age
 **Key files:**
 
 - `.github/upstream-sha.txt` — source of truth for last synced upstream SHA
-- `.github/workflows/upstream-sync.yml` — weekly detection action
 - `.github/scripts/verify-sync.sh` — post-merge identity gate
 
 ---
