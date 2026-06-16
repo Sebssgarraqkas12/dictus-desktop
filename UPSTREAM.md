@@ -275,14 +275,14 @@ Review in GitHub UI. After CI passes, merge with **"Create a merge commit"** (pr
 
 ## Anti-Patterns (Do NOT do these)
 
-| Anti-pattern                                          | Why it's wrong                                                                                                 | What to do instead                                                         |
-| ----------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------- |
-| `git checkout --theirs src-tauri/tauri.conf.json`     | Accepts Handy identity fields (productName, identifier, pubkey, endpoints)                                     | Resolve manually, field by field — keep Dictus values                      |
-| `git cherry-pick c1697b2 84d88f9 30b57c4 fdc8cb7`     | Loses the merge relationship; creates separate commits instead of one merge commit preserving upstream history | Use `git merge upstream/main --no-ff`                                      |
-| Hand-edit `Cargo.lock`                                | Machine-generated format; manual edits introduce subtle version conflicts                                      | Run `cargo generate-lockfile` after resolving `Cargo.toml`                 |
-| Update `upstream-sha.txt` outside of a merge commit  | Marks upstream as "synced" before the merge actually lands on main                                             | Only update `upstream-sha.txt` as part of the merge commit landing on main |
-| Skip `verify-sync.sh` before pushing                  | Identity regressions silently land on main                                                                     | Always run the validator; fix all failures before pushing                  |
-| Use `git merge --abort` on first conflict             | Abandons the entire merge; you lose the branch state                                                           | Resolve conflicts file by file — see Section 4                             |
+| Anti-pattern                                        | Why it's wrong                                                                                                 | What to do instead                                                         |
+| --------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------- |
+| `git checkout --theirs src-tauri/tauri.conf.json`   | Accepts Handy identity fields (productName, identifier, pubkey, endpoints)                                     | Resolve manually, field by field — keep Dictus values                      |
+| `git cherry-pick c1697b2 84d88f9 30b57c4 fdc8cb7`   | Loses the merge relationship; creates separate commits instead of one merge commit preserving upstream history | Use `git merge upstream/main --no-ff`                                      |
+| Hand-edit `Cargo.lock`                              | Machine-generated format; manual edits introduce subtle version conflicts                                      | Run `cargo generate-lockfile` after resolving `Cargo.toml`                 |
+| Update `upstream-sha.txt` outside of a merge commit | Marks upstream as "synced" before the merge actually lands on main                                             | Only update `upstream-sha.txt` as part of the merge commit landing on main |
+| Skip `verify-sync.sh` before pushing                | Identity regressions silently land on main                                                                     | Always run the validator; fix all failures before pushing                  |
+| Use `git merge --abort` on first conflict           | Abandons the entire merge; you lose the branch state                                                           | Resolve conflicts file by file — see Section 4                             |
 
 ---
 
