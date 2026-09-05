@@ -182,6 +182,13 @@ AI-assisted contributions are welcome. If you used an AI tool, disclose it in th
 
 ## 🧪 Testing Your Changes
 
+Run the repository's lint and formatting tools before submitting code changes:
+
+```bash
+bun run lint
+bun run format
+```
+
 Run the app in development mode when appropriate:
 
 ```bash
