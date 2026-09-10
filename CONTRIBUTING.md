@@ -171,7 +171,8 @@ AI-assisted contributions are welcome. If you used an AI tool, disclose it in th
 - Follow React hooks best practices
 - Use functional components
 - Keep components small and focused
-- Follow the project's existing styling conventions
+- Use Tailwind CSS for styling
+- Route every user-facing string through i18next — add the key to `src/i18n/locales/en/translation.json` and read it with `t('key.path')`. ESLint fails on hardcoded strings in JSX
 
 **General:**
 
@@ -186,8 +187,10 @@ Run the repository's lint and formatting tools before submitting code changes:
 
 ```bash
 bun run lint
-bun run format
+bun run format:check
 ```
+
+`bun run format` rewrites files in place; `format:check` only reports, which is what CI runs.
 
 Run the app in development mode when appropriate:
 
@@ -220,6 +223,7 @@ If you're new to the project, look for issues labeled `good first issue` or `hel
 
 ## 📞 Getting Help
 
+- [Telegram community](https://t.me/getdictus) — quickest way to reach maintainers and other users
 - [GitHub Discussions](https://github.com/getdictus/dictus-desktop/discussions)
 - [Repository issues](https://github.com/getdictus/dictus-desktop/issues)
 
